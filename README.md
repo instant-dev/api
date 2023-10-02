@@ -10,7 +10,7 @@ It allows JavaScript (Node.js) functions to be seamlessly exported as HTTP APIs 
 **defining what the HTTP interface will look like and how it behaves in the preceding comment block**
 - including type-safety mechanisms.
 
-### Quick Example of a Instant API
+### Quick Example of an Instant API
 
 The following is a real-world excerpt of an API that can be used
 to query a Spreadsheet like a Database. The underlying implementation has been
@@ -196,7 +196,7 @@ module.exports = async (id = null, username, age, communityScore, metadata, frie
 
 ## Instant API Resource Definition
 
-A Instant API definition is a JSON output, traditionally saved as a
+An Instant API definition is a JSON output, traditionally saved as a
 `definition.json` file, generated from a JavaScript file,
 that respects the following format.
 
