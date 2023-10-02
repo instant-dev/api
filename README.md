@@ -1,28 +1,16 @@
-# FunctionScript
+# Instant API
 
-![FunctionScript Logo](/images/fs-wordmark.png)
-
-![travis-ci build](https://travis-ci.org/FunctionScript/FunctionScript.svg?branch=master)
-![npm version](https://badge.fury.io/js/functionscript.svg)
+![travis-ci build](https://travis-ci.org/instant-devs/api.svg?branch=master)
+![npm version](https://badge.fury.io/js/@instant.dev/api.svg)
 
 ## An API gateway and framework for turning functions into web services
 
-FunctionScript is a language and specification for turning JavaScript
-functions into typed HTTP APIs. It allows JavaScript (Node.js) functions to be
-seamlessly exported as HTTP APIs by **defining what the HTTP interface will look
-like and how it behaves in the preceding comment block** - including type-safety mechanisms.
+Instant API is a framework for turning JavaScript functions into typed HTTP APIs.
+It allows JavaScript (Node.js) functions to be seamlessly exported as HTTP APIs by
+**defining what the HTTP interface will look like and how it behaves in the preceding comment block**
+- including type-safety mechanisms.
 
-FunctionScript arose out of a need to introduce developers with little
-programming experience, but familiarity with JavaScript, to full-stack API
-development and best practices around defining and connecting HTTP application
-interfaces. For this reason, the goals of the language are significantly different than
-[TypeScript](https://github.com/microsoft/TypeScript).
-**FunctionScript is intended to provide an easy introduction to API development for those of any skill level, while maintaining professional power and flexibility.**
-
-FunctionScript is the primary specification underpinning the [Autocode](https://autocode.com)
-platform and its standard library of APIs.
-
-### Quick Example of a FunctionScript API
+### Quick Example of a Instant API
 
 The following is a real-world excerpt of an API that can be used
 to query a Spreadsheet like a Database. The underlying implementation has been
@@ -78,42 +66,20 @@ It will return an `object`:
    - `selectQueryResult.range` must be a `string`
    - `selectQueryResult.rows` must be an `array`
 
-## Background
-
-The impetus for creating FunctionScript is simple: it stems from the initial
-vision of [Autocode](https://autocode.com). We believe the modern web is
-missing a base primitive - the API. Daily, computer systems and developers around
-the planet make trillions of requests to perform specific tasks: process
-credit card payments with [Stripe](https://stripe.com), send team messages via
-[Slack](https://slack.com), create SMS messages with [Twilio](https://twilio.com).
-These requests are made primarily over HTTP: Hypertext Transfer Protocol. However,
-little to no "hypertext" is actually sent or received, these use cases have emerged
-in an *ad hoc* fashion as a testament to the power of the world wide web. Oftentimes,
-API standardization attempts have been presented as band-aids instead of solutions:
-requiring developers to jury rig a language, framework, markup language and
-hosting provider together just to get a simple "hello world" out the door.
-
-By creating API development standards as part of a **language specification**
-instead of a framework, FunctionScript truly treats the web API as a base primitive of
-software development instead of an afterthought. This allows teams to be able to
-deliver high-quality APIs with the same fidelity as organizations like
-Stripe in a fraction of the time without requiring any additional tooling.
-
 # Table of Contents
 
 1. [Introduction](#introduction)
-1. [Why FunctionScript?](#why-functionscript)
-1. [FunctionScript Examples](#functionscript-examples)
+1. [Instant API Examples](#instant-api-examples)
    1. [All Available Types](#all-available-types)
 1. [Specification](#specification)
-   1. [FunctionScript Resource Definition](#functionscript-resource-definition)
+   1. [Instant API Resource Definition](#instant-api-resource-definition)
    1. [Context Definition](#context-definition)
    1. [Parameters](#parameters)
       1. [Constraints](#constraints)
       1. [Types](#types)
       1. [Type Conversion](#type-conversion)
       1. [Nullability](#nullability)
-   1. [FunctionScript Resource Requests](#functionscript-resource-requests)
+   1. [Instant API Resource Requests](#instant-api-resource-requests)
       1. [Context](#context)
       1. [Errors](#errors)
          1. [ClientError](#clienterror)
@@ -123,17 +89,16 @@ Stripe in a fraction of the time without requiring any additional tooling.
          1. [FatalError](#fatalerror)
          1. [RuntimeError](#runtimeerror)
          1. [ValueError](#valueerror)
-1. [FunctionScript Server and Gateway: Implementation](#functionscript-server-and-gateway-implementation)
+1. [Instant API Server and Gateway: Implementation](#instant-api-server-and-gateway-implementation)
 1. [Acknowledgements](#acknowledgements)
 
 # Introduction
 
-To put it simply, FunctionScript defines semantics and rules for turning exported
+To put it simply, Instant API defines semantics and rules for turning exported
 JavaScript (Node.js) functions into strongly-typed, HTTP-accessible web APIs.
-In order to use FunctionScript, you'd set up your own [FunctionScript Gateway](#functionscript-server-and-gateway-implementation) or you would use an existing FunctionScript-compliant service
-like [Autocode](https://autocode.com/).
+In order to use Instant API, you'd set up your own [Instant API Gateway](#instant-api-server-and-gateway-implementation).
 
-FunctionScript allows you to turn something like this...
+Instant API allows you to turn something like this...
 
 ```javascript
 // hello_world.js
@@ -179,60 +144,7 @@ Or, when a type mismatch occurs (like `{"name":10}`):
 }
 ```
 
-## Why FunctionScript?
-
-FunctionScript is intended primarily to provide a scaffold to build and deliver
-APIs easily. It works best as a part of the [Autocode](https://autocode.com/)
-platform which consumes the FunctionScript API definitions, hosts the code,
-generates documentation from the definitions, and automatically handles versioning and
-environment management. The reason we've open sourced the language specification
-is so that developers have an easier time developing against the highly modular API
-ecosystem we've created and can contribute their thoughts and requests.
-
-You can break down the reason for the development of FunctionScript into a few
-key points:
-
-- Modern developers and people being introduced to software development for the
-  first time are often trying to build web-native scripts. It is *exceedingly*
-  difficult to go from "zero to API" in less than a few hours, writing code is
-  just the first step of many. We'd like it to be the first and only step.
-
-- No true standards around APIs have ever been built or enforced in a rigorous
-  manner across the industry. Primarily, opinions around SOAP, REST and GraphQL
-  requests have been built into **frameworks and tools** instead of a
-  **language specification**, which has artificially inflated the cognitive
-  overhead required to ship functional web-based software.
-
-- Companies like Stripe and Twilio which have built and enforced their own API
-  development paradigms internally have unlocked massive developer audiences in
-  short timeframes, indicating the power of treating web APIs as a first-class
-  citizen of development.
-
-- [Serverless computing](https://en.wikipedia.org/wiki/Serverless_computing),
-  specifically the Function-as-a-Service model of web-based computation, has made
-  API development significantly more accessible but has not brought us over the
-  "last-mile" hump.
-
-- JavaScript, specifically Node.js, is an ideal target for API development
-  standardization due to its accessibility (front-end and back-end), growth
-  trajectory, and flexibility. Most new developers are introduced to JavaScript
-  out of necessity.
-
-- As opposed to something like [TypeScript](https://github.com/microsoft/TypeScript),
-  FunctionScript helps newer entrants to software development by extending
-  JavaScript with very little overhead. It adds types around *only the HTTP interface*,
-  leaving the majority of the language footprint untouched but strengthening the
-  "weakest" and least predictable link in the development chain: user input.
-
-With FunctionScript, it's our goal to develop a language specification for
-building APIs that automatically provides a number of necessary features without
-additional tooling:
-
-- Standardized API Calling Conventions (HTTP)
-- Type-Safety Mechanisms at the HTTP -> Code Interface
-- Automatically Generated API Documentation
-
-# FunctionScript Examples
+# Instant API Examples
 
 We'll be updating this section with examples for you to play with and modify
 on your own.
@@ -282,9 +194,9 @@ module.exports = async (id = null, username, age, communityScore, metadata, frie
 
 # Specification
 
-## FunctionScript Resource Definition
+## Instant API Resource Definition
 
-A FunctionScript definition is a JSON output, traditionally saved as a
+A Instant API definition is a JSON output, traditionally saved as a
 `definition.json` file, generated from a JavaScript file,
 that respects the following format.
 
@@ -305,7 +217,7 @@ module.exports = async (alpha, beta = 2, gamma, context) => {
 };
 ```
 
-The FunctionScript parser will generate a `definition.json` file that looks
+The Instant API parser will generate a `definition.json` file that looks
 like the following:
 
 ```json
@@ -375,15 +287,15 @@ Parameters have the following format;
 | Field | Required | Definition |
 | ----- | -------- | ---------- |
 | name | NamedParameter Only | The name of the Parameter, must match `/[A-Z][A-Z0-9_]*/i` |
-| type | yes | A string representing a valid FunctionScript type |
+| type | yes | A string representing a valid Instant API type |
 | description | yes | A short description of the parameter, can be empty string (`""`) |
 | defaultValue | no | Must match the specified type. **If type is not provided, this parameter is required** |
 
 ### Types
 
-As FunctionScript interfaces with "userland" (user input),
+As Instant API interfaces with "userland" (user input),
 a strongly typed signature is enforced for all inbound parameters. The following
-is a list of supported FunctionScript types.
+is a list of supported Instant API types.
 
 | Type | Definition | Example Input Values (JSON) |
 | ---- | ---------- | -------------- |
@@ -408,7 +320,7 @@ Otherwise, parameters provided to a function are expected to match their
 defined types. Requests made over HTTP via query parameters or POST data
 with type `application/x-www-form-urlencoded` will be automatically
 converted from strings to their respective expected types, when possible
-(see [FunctionScript Resource Requests](#functionscript-resource-requests) below):
+(see [Instant API Resource Requests](#instant-api-resource-requests) below):
 
 | Type | Conversion Rule |
 | ---- | --------------- |
@@ -487,9 +399,9 @@ module.exports = (imageName) => {
 };
 ```
 
-## FunctionScript Resource Requests
+## Instant API Resource Requests
 
-FunctionScript requests *must* complete the following steps;
+Instant API requests *must* complete the following steps;
 
 1. Ensure the **Resource Definition** is valid and compliant, either on storage
     or accession.
@@ -530,10 +442,10 @@ FunctionScript requests *must* complete the following steps;
 
 ### Context
 
-Every function intended to be consumed via FunctionScript has the option to specify
+Every function intended to be consumed via Instant API has the option to specify
 an *optional* magic `context` parameter that receives vendor-specific
 information about the function execution context - for example, if consumed over
-HTTP, header details. FunctionScript definitions must specify whether or not they
+HTTP, header details. Instant API definitions must specify whether or not they
 consume a `context` object. Context objects are extensible but **MUST** contain
 the following fields;
 
@@ -545,7 +457,7 @@ the following fields;
 
 ### Errors
 
-Errors returned by FunctionScript-compliant services must follow the following JSON
+Errors returned by Instant API-compliant services must follow the following JSON
 format:
 
 ```json
@@ -640,7 +552,7 @@ two classifications of a ParameterError for a parameter; *required* and
 #### ValueError
 
 `ValueError`s are a result of your function returning an unexpected value
-  based on FunctionScript type-safety mechanisms. These **must** return status code
+  based on Instant API type-safety mechanisms. These **must** return status code
   `502` if over HTTP.
 
 `ValueError` looks like an *invalid* ParameterError, where the `details`
@@ -669,33 +581,21 @@ due to implementation issues on the part of the function developer.
 }
 ```
 
-# FunctionScript Server and Gateway: Implementation
+# Instant API Server and Gateway: Implementation
 
-A fully-compliant FunctionScript gateway (that just uses local function resources)
+A fully-compliant Instant API gateway (that just uses local function resources)
 is available with this package, simply clone it and run `npm test` or look
 at the `/tests` folder for more information.
 
-The FunctionScript specification is used as the platform specification
-for [Autocode](https://autocode.com), and is available for local use with the
-[Autocode CLI](https://github.com/acode/cli) which relies on this
-repository as a dependency.
-
 # Acknowledgements
 
-FunctionScript is the result of years of concerted effort working to make API
-development easier. It would not be possible without the personal and financial
-commitments of some very amazing people and companies. We'd like to thank our
-customers, investors, supporters, friends and family.
+Special thank you to [Scott Gamble](https://x.com/threesided) who helps run all of the front-of-house work for instant.dev 💜!
 
-### Core Contributors
-
-- [**Keith Horwood**](https://twitter.com/keithwhor)
-- [**Jacob Lee**](https://twitter.com/hacubu)
-- [**Steve Meyer**](https://twitter.com/notoriaga)
-- [**Yusuf Musleh**](https://twitter.com/yusuf-musleh)
-
-# Notes
-
-The software contained within this repository has been developed and is
-copyrighted by the [Autocode](https://autocode.com) team (Polybit Inc.)
-and is MIT licensed.
+| Destination | Link |
+| ----------- | ---- |
+| Home | [instant.dev](https://instant.dev) |
+| GitHub | [github.com/instant-dev](https://github.com/instant-dev) |
+| Discord | [discord.gg/puVYgA7ZMh](https://discord.gg/puVYgA7ZMh) |
+| X / instant.dev | [x.com/instantdevs](https://x.com/instantdevs) |
+| X / Keith Horwood | [x.com/keithwhor](https://x.com/keithwhor) |
+| X / Scott Gamble | [x.com/threesided](https://x.com/threesided) |

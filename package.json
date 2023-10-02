@@ -1,6 +1,6 @@
 {
-  "name": "functionscript",
-  "version": "2.10.6",
+  "name": "@instant.dev/api",
+  "version": "0.0.0",
   "description": "An API gateway and framework for turning functions into web services",
   "author": "Keith Horwood <keithwhor@gmail.com>",
   "main": "index.js",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@babel/parser": "^7.12.11",
-    "fast-xml-parser": "^3.19.0",
+    "fast-xml-parser": "^4.3.2",
     "json-to-pretty-yaml": "^1.2.2",
     "keyql": "^0.2.2",
     "mime": "^2.5.2",

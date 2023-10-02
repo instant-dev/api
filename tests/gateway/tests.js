@@ -1124,12 +1124,12 @@ module.exports = (expect) => {
     });
   });
 
-  it('Should NOT overwrite x-functionscript', done => {
-    request('POST', {}, '/sanitize/http_object/', {body: '<b>hello</b>', headers: {'x-functionscript': '$'}}, (err, res, result) => {
+  it('Should NOT overwrite x-instant-api', done => {
+    request('POST', {}, '/sanitize/http_object/', {body: '<b>hello</b>', headers: {'x-instant-api': '$'}}, (err, res, result) => {
 
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
-      expect(res.headers['x-functionscript']).to.not.equal('$');
+      expect(res.headers['x-instant-api']).to.not.equal('$');
       expect(result.toString()).to.equal('<b>hello</b>');
       done();
 
@@ -5622,7 +5622,7 @@ module.exports = (expect) => {
       expect(result.servers).to.be.an('Array');
       expect(result.servers[0]).to.exist;
       expect(result.servers[0].url).to.equal('localhost');
-      expect(result.servers[0].description).to.equal('FunctionScript Gateway');
+      expect(result.servers[0].description).to.equal('Instant API Gateway');
       expect(result.paths).to.be.an('Object');
       expect(result.paths['/my_function/']).to.exist;
       expect(result.paths['/my_function/'].post).to.exist;
