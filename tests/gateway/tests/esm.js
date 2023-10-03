@@ -179,4 +179,100 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
+  it('Should respect ESM-defined schema and fail if key not provided', done => {
+    
+    request('POST', {}, '/esm/nested/', {alpha: 'hello', beta: {}, gamma: [1, 2]}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details).to.exist;
+      expect(result.error.details.beta).to.exist;
+      expect(result.error.details.beta.mismatch).to.equal('beta.num');
+
+      done();
+
+    });
+
+  });
+
+  it('Should respect ESM-defined schema and fail if key invalid', done => {
+    
+    request('POST', {}, '/esm/nested/', {alpha: 'hello', beta: {num: 'xx'}, gamma: [1, 2]}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details).to.exist;
+      expect(result.error.details.beta).to.exist;
+      expect(result.error.details.beta.mismatch).to.equal('beta.num');
+
+      done();
+
+    });
+
+  });
+
+  it('Should respect ESM-defined schema and fail if nested key invalid', done => {
+    
+    request('POST', {}, '/esm/nested/', {alpha: 'hello', beta: {num: 10, obj: {num: 'xx'}}, gamma: [1, 2]}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details).to.exist;
+      expect(result.error.details.beta).to.exist;
+      expect(result.error.details.beta.mismatch).to.equal('beta.obj.num');
+
+      done();
+
+    });
+
+  });
+
+  it('Should respect ESM-defined schema and succed if everything passed properly', done => {
+    
+    request('POST', {}, '/esm/nested/', {alpha: 'hello', beta: {num: 10, obj: {num: 99, str: 'lol'}}, gamma: [1, 2]}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result).to.deep.equal({
+        alpha: 'hello',
+        beta: {num: 10, obj: {num: 99, str: 'lol'}},
+        gamma: [1, 2]
+      });
+
+      done();
+
+    });
+
+  });
+
+  // console.log(result.error.details);
+  // expect(true).to.equal(false);
+  // expect(result.alpha).to.exist;
+  // expect(result.beta).to.exist;
+  // expect(result.gamma).to.exist;
+
 };
