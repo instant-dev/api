@@ -37,7 +37,9 @@ describe('LibDoc', () => {
         try {
           parser.parseDefinition(functionCase.pathname, functionCase.buffer);
         } catch (e) {
-          // console.log(e.message);
+          if (functionCase.valid) {
+            console.error(e);
+          }
           err = e;
         }
 
