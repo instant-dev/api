@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const CASE_PATH = './tests/files/cases';
 const cases = fs.readdirSync(CASE_PATH).map(filename => {
-  if (!filename.endsWith('.js')) {
-    throw new Error(`Invalid case ${filename} in ./tests/files/cases`);
+  if (!filename.match(/\.[cm]?js$/)) {
+    throw new Error(`Invalid case ${filename} in "./tests/files/cases", file must be (.js|.mjs|.cjs)`);
   }
   let name = filename.substr(0, filename.length - 3);
   let names = name.split('_').map(n => n[0].toUpperCase() + n.substr(1));

@@ -7,8 +7,8 @@
 
 Instant API is a framework for turning JavaScript functions into typed HTTP APIs.
 It allows JavaScript (Node.js) functions to be seamlessly exported as HTTP APIs by
-**defining what the HTTP interface will look like and how it behaves in the preceding comment block**
-- including type-safety mechanisms.
+**defining what the HTTP interface will look like and how it behaves in the preceding comment block**,
+including type-safety mechanisms.
 
 ### Quick Example of an Instant API
 
