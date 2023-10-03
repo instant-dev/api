@@ -60,8 +60,6 @@ describe('Instant API', () => {
 
     it('Should read all functions correctly', () => {
 
-      console.log(Object.keys(definitions).sort());
-
       expect(definitions).to.haveOwnProperty('');
       expect(definitions).to.haveOwnProperty('test');
       expect(definitions).to.haveOwnProperty('returns');
