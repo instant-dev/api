@@ -21,25 +21,3 @@ export async function POST (str, repeat) {
   return str.split('').reverse().join('').repeat(repeat);
 
 };
-
-/**
- * Outputs a phrase once
- * @param {string} str
- * @returns {string}
- */
-export const PUT = async (str) => {
-
-  return str;
-
-};
-
-/**
- * Outputs a phrase once backwards
- * @param {string} str
- * @returns {string}
- */
-export const DELETE = async (str) => {
-
-  return str.split('').reverse().join('');
-
-};

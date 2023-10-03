@@ -4,7 +4,7 @@
  * @param {integer} repeat
  * @returns {string}
  */
-export async function get (str, repeat) {
+export async function GET (str, repeat) {
 
   return str.repeat(repeat);
 
@@ -16,7 +16,7 @@ export async function get (str, repeat) {
  * @param {integer} repeat
  * @returns {string}
  */
-export async function post (str, repeat) {
+export async function POST (str, repeat) {
 
   return str.split('').reverse().join('').repeat(repeat);
 
@@ -27,7 +27,7 @@ export async function post (str, repeat) {
  * @param {string} str
  * @returns {string}
  */
-export const put = async (str) => {
+export const PUT = async (str) => {
 
   return str;
 
@@ -38,7 +38,7 @@ export const put = async (str) => {
  * @param {string} str
  * @returns {string}
  */
-export const del = async (str) => {
+export const DELETE = async (str) => {
 
   return str.split('').reverse().join('');
 

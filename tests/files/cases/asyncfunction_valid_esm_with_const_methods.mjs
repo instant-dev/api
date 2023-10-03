@@ -4,7 +4,7 @@
  * @param {number} b
  * @param {array} c
  */
-export const get = async (a, b, c) => {
+export const GET = async (a, b, c) => {
 
 }
 
@@ -14,7 +14,7 @@ export const get = async (a, b, c) => {
  * @param {number} b
  * @param {array} c
  */
-export const put = async (a, b, c) => {
+export const PUT = async (a, b, c) => {
 
 }
 
@@ -24,7 +24,7 @@ export const put = async (a, b, c) => {
  * @param {number} b
  * @param {array} c
  */
-export const post = async (a, b, c) => {
+export const POST = async (a, b, c) => {
 
 }
 
@@ -34,6 +34,6 @@ export const post = async (a, b, c) => {
  * @param {number} b
  * @param {array} c
  */
-export const del = async (a, b, c) => {
+export const DELETE = async (a, b, c) => {
 
 }

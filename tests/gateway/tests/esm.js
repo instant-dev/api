@@ -144,4 +144,39 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
+  it('Should successfully execute an ESM function missing methods if the method exists', done => {
+    
+    request('POST', {}, '/esm/missing_method/', {str: 'ABC ', repeat: 10}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+      expect(result).to.equal(' CBA'.repeat(10));
+
+      done();
+
+    });
+
+  });
+
+  it('Should fail to execute an ESM function missing methods if the method does not exist', done => {
+    
+    request('PUT', {}, '/esm/missing_method/', {str: 'ABC ', repeat: 10}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(501);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      done();
+
+    });
+
+  });
+
 };

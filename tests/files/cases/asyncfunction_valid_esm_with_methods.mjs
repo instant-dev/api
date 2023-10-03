@@ -4,7 +4,7 @@
  * @param {number} b
  * @param {array} c
  */
-export async function get (a, b, c) {
+export async function GET (a, b, c) {
 
 }
 
@@ -14,7 +14,7 @@ export async function get (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function put (a, b, c) {
+export async function PUT (a, b, c) {
 
 }
 
@@ -24,7 +24,7 @@ export async function put (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function post (a, b, c) {
+export async function POST (a, b, c) {
 
 }
 
@@ -34,6 +34,6 @@ export async function post (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function del (a, b, c) {
+export async function DELETE (a, b, c) {
 
 }
