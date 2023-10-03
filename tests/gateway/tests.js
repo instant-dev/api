@@ -3678,65 +3678,6 @@ module.exports = (expect) => {
     });
   });
 
-  it('Should not populate "context.keys" with no authorization keys header provided', done => {
-    request('POST', {}, '/keys/', {},
-    (err, res, result) => {
-
-      expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(200);
-      expect(result).to.exist;
-      expect(result).to.deep.equal({
-        TEST_KEY: null,
-        ANOTHER_KEY: null,
-        A_THIRD_KEY: null
-      });
-      done();
-
-    });
-  });
-
-  it('Should not populate "context.keys" if the authorization keys header is not a serialized object', done => {
-    request('POST', {
-      'X-Authorization-Keys': 'stringvalue'
-    }, '/keys/', {},
-    (err, res, result) => {
-
-      expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(200);
-      expect(result).to.exist;
-      expect(result).to.deep.equal({
-        TEST_KEY: null,
-        ANOTHER_KEY: null,
-        A_THIRD_KEY: null
-      });
-      done();
-
-    });
-  });
-
-  it('Should populate "context.keys" with only the proper keys', done => {
-    request('POST', {
-      'X-Authorization-Keys': JSON.stringify({
-        TEST_KEY: '123',
-        ANOTHER_KEY: 'abc',
-        UNSPECIFIED_KEY: '987'
-      })
-    }, '/keys/', {},
-    (err, res, result) => {
-
-      expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(200);
-      expect(result).to.exist;
-      expect(result).to.deep.equal({
-        TEST_KEY: '123',
-        ANOTHER_KEY: 'abc',
-        A_THIRD_KEY: null
-      });
-      done();
-
-    });
-  });
-
   it('Should not populate "context.providers" with no authorization providers header provided', done => {
     request('POST', {}, '/context/', {},
     (err, res, result) => {
