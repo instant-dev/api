@@ -1,10 +1,20 @@
 /**
+ * My function
+ * @param {string} a
+ * @param {number} b
+ * @param {array} c
+ */
+export default async (a, b, c) => {
+  /* do nothing */
+}
+
+/**
  * My get function
  * @param {string} a
  * @param {number} b
  * @param {array} c
  */
-export async function get (a, b, c) {
+export const get = async (a, b, c) => {
 
 }
 
@@ -14,7 +24,7 @@ export async function get (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function put (a, b, c) {
+export const put = async (a, b, c) => {
 
 }
 
@@ -24,7 +34,7 @@ export async function put (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function post (a, b, c) {
+export const post = async (a, b, c) => {
 
 }
 
@@ -34,6 +44,6 @@ export async function post (a, b, c) {
  * @param {number} b
  * @param {array} c
  */
-export async function del (a, b, c) {
+export const del = async (a, b, c) => {
 
 }

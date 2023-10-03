@@ -1,4 +1,14 @@
 /**
+ * My function
+ * @param {string} a
+ * @param {number} b
+ * @param {array} c
+ */
+export default async (a, b, c) => {
+  /* do nothing */
+}
+
+/**
  * My get function
  * @param {string} a
  * @param {number} b
