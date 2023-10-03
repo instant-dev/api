@@ -60,12 +60,17 @@ describe('Instant API', () => {
 
     it('Should read all functions correctly', () => {
 
-      expect(Object.keys(definitions).length).to.equal(25);
+      console.log(Object.keys(definitions).sort());
+
       expect(definitions).to.haveOwnProperty('');
       expect(definitions).to.haveOwnProperty('test');
       expect(definitions).to.haveOwnProperty('returns');
       expect(definitions).to.haveOwnProperty('default');
+      expect(definitions).to.haveOwnProperty('default_return');
       expect(definitions).to.haveOwnProperty('multiline_description');
+      expect(definitions).to.haveOwnProperty('named_return');
+      expect(definitions).to.haveOwnProperty('noname_return');
+      expect(definitions).to.haveOwnProperty('nullable_return');
       expect(definitions).to.haveOwnProperty('dir/test');
       expect(definitions).to.haveOwnProperty('dir/sub');
       expect(definitions).to.haveOwnProperty('dir/sub/test');
@@ -77,10 +82,19 @@ describe('Instant API', () => {
       expect(definitions).to.haveOwnProperty('enum_return');
       expect(definitions).to.haveOwnProperty('enum_nested');
       expect(definitions).to.haveOwnProperty('enum_nested_optional');
+      expect(definitions).to.haveOwnProperty('enum_schema');
       expect(definitions).to.haveOwnProperty('options');
       expect(definitions).to.haveOwnProperty('keyql_options');
       expect(definitions).to.haveOwnProperty('alternate_schemas');
       expect(definitions).to.haveOwnProperty('inline');
+      expect(definitions).to.haveOwnProperty('esm_default');
+      expect(definitions).to.haveOwnProperty('esm_named#GET');
+      expect(definitions).to.haveOwnProperty('esm_named#POST');
+      expect(definitions).to.haveOwnProperty('esm_named#PUT');
+      expect(definitions).to.haveOwnProperty('esm_named#DELETE');
+      expect(definitions).to.not.haveOwnProperty('esm_named');
+
+      expect(Object.keys(definitions).length).to.equal(30);
 
     });
 
