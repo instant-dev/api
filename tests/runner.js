@@ -8,7 +8,7 @@ const cases = fs.readdirSync(CASE_PATH).map(filename => {
   if (!filename.match(/\.[cm]?js$/)) {
     throw new Error(`Invalid case ${filename} in "./tests/files/cases", file must be (.js|.mjs|.cjs)`);
   }
-  let name = filename.substr(0, filename.length - 3);
+  let name = filename.slice(0, filename.length - 3);
   let names = name.split('_').map(n => n[0].toUpperCase() + n.substr(1));
   return {
     name: [names[0], `(${names[1]})`].concat(names.slice(2)).join(' '),
@@ -18,13 +18,13 @@ const cases = fs.readdirSync(CASE_PATH).map(filename => {
   }
 });
 
+describe('Instant API', () => {
 
-describe('LibDoc', () => {
-
-  const FunctionParser = require('../index.js').FunctionParser;
+  const instantModule = require('../index.js');
+  const FunctionParser = instantModule.FunctionParser;
   const parser = new FunctionParser();
   const NodeJsFunctionParser = new FunctionParser.parsers['nodejs']();
-  const types = require('../index.js').types;
+  const types = instantModule.types;
 
   describe('Function Validation', () => {
 
@@ -1911,7 +1911,7 @@ describe('LibDoc', () => {
 
   describe('Gateway', () => {
 
-    require('./gateway/tests.js')(expect);
+    require('./gateway/tests.js')(expect, instantModule);
 
   });
 
