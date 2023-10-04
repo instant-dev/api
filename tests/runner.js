@@ -1162,8 +1162,15 @@ describe('Instant API', () => {
             {
               name: '',
               description: '',
-              type: 'number',
-              range: {min: 20, max: 30}
+              type: 'array',
+              schema: [
+                {
+                  name: '',
+                  description: '',
+                  type: 'number',
+                  range: {min: 20, max: 30}
+                }
+              ]
             }
           ]
         }
