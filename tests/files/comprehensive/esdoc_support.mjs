@@ -7,7 +7,7 @@
  * @param {number{1,100}}   beta.obj.num
  * @param {number{1.1,2.1}} beta.obj.float
  * @param {string{2..7}}    beta.obj.str
- * @param {array<array<number{20,30}>>} gamma
+ * @param {array<array<number{20,30}>>{1..3}} gamma
  * @param {boolean|string} boolstring
  * @param {array{5}|"jazzhands"|5.9|boolean} mystery
  * @returns {object} response

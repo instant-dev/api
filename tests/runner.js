@@ -1158,6 +1158,7 @@ describe('Instant API', () => {
           name: 'gamma',
           description: '',
           type: 'array',
+          size: {min: 1, max: 3},
           schema: [
             {
               name: '',
