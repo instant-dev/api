@@ -269,10 +269,95 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
-  // console.log(result.error.details);
-  // expect(true).to.equal(false);
-  // expect(result.alpha).to.exist;
-  // expect(result.beta).to.exist;
-  // expect(result.gamma).to.exist;
+  it('Should respect the type "any" options property', done => {
+    
+    request('POST', {}, '/esm/any_options/', {value: 1}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(result).to.exist;
+      expect(result).to.deep.equal(1);
+
+      request('POST', {}, '/esm/any_options/', {value: "two"}, (err, res, result) => {
+
+        expect(err).to.not.exist;
+        expect(res.statusCode).to.equal(200);
+        expect(result).to.exist;
+        expect(result).to.deep.equal("two");
+
+        request('POST', {}, '/esm/any_options/', {value: ["three", "four"]}, (err, res, result) => {
+
+          expect(err).to.not.exist;
+          expect(res.statusCode).to.equal(200);
+          expect(result).to.exist;
+          expect(result).to.deep.equal(["three", "four"]);
+
+          done();
+
+        });
+
+      });
+
+    });
+
+  });
+
+  it('Should respect the type "any" options property with invalid param', done => {
+    
+    request('POST', {}, '/esm/any_options/', {value: 2}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details).to.exist;
+      expect(result.error.details.value).to.exist;
+      done();
+
+    });
+
+  });
+
+  it('Should respect the type "boolean|string" options with a boolean', done => {
+    
+    request('POST', {}, '/esm/alternate_types/', {value: true}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.value).to.equal(true);
+      done();
+
+    });
+
+  });
+
+  it('Should respect the type "boolean|string" options with a string', done => {
+    
+    request('POST', {}, '/esm/alternate_types/', {value: 'true'}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.value).to.equal('true');
+      done();
+
+    });
+
+  });
 
 };

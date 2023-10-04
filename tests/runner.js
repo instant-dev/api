@@ -1173,6 +1173,18 @@ describe('Instant API', () => {
               ]
             }
           ]
+        },
+        {
+          name: 'boolstring',
+          description: '',
+          type: 'boolean',
+          alternateTypes: [
+            {
+              name: '',
+              description: '',
+              type: 'string'
+            }
+          ]
         }
       ];
 

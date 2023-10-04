@@ -8,14 +8,16 @@
  * @param {number{1.1,2.1}} beta.obj.float
  * @param {string{2..7}}    beta.obj.str
  * @param {array<array<number{20,30}>>} gamma
+ * @param {boolean|string} boolstring
  * @returns {object} response
  */
-export default async (alpha, beta, gamma) => {
+export default async (alpha, beta, gamma, boolstring) => {
   
   return {
     alpha,
     beta,
-    gamma
+    gamma,
+    boolstring
   };
 
 }
