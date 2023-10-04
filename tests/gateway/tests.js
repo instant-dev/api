@@ -79,24 +79,21 @@ function request (method, headers, path, data, callback) {
 
 module.exports = (expect, instantModule) => {
 
-  const {Gateway, FunctionParser} = instantModule;
+  const { Gateway, FunctionParser } = instantModule;
+  const parser = new FunctionParser();
 
   const FaaSGateway = new Gateway({
     debug: false,
     root: ROOT,
     defaultTimeout: 1000
   });
-  const parser = new FunctionParser();
 
   before(() => {
     const preloadFiles = {
       'functions/sample_preload.js': Buffer.from(`module.exports = async () => { return true; };`)
     };
+    FaaSGateway.load(ROOT, preloadFiles);
     FaaSGateway.listen(PORT);
-    FaaSGateway.define(
-      parser.load(ROOT, 'functions', 'www', null, preloadFiles),
-      preloadFiles
-    );
   });
 
   describe('Main tests', () => {
