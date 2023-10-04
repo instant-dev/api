@@ -81,7 +81,12 @@ module.exports = (expect, instantModule) => {
 
   const {Gateway, FunctionParser} = instantModule;
 
-  const FaaSGateway = new Gateway({debug: false, root: ROOT, defaultTimeout: 1000});
+  const FaaSGateway = new Gateway({
+    debug: false,
+    root: ROOT,
+    defaultTimeout: 1000,
+    developmentMode: true
+  });
   const parser = new FunctionParser();
 
   before(() => {

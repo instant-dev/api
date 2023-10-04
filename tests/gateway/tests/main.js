@@ -1751,6 +1751,24 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(result.error).to.exist;
       expect(result.error).to.be.an('object');
       expect(result.error.type).to.equal('RuntimeError');
+      expect(result.error.message).to.equal('crap');
+      done();
+
+    });
+  });
+
+  it('Should register an unhandled promise rejection', done => {
+    request('POST', {}, '/runtime/promise_unhandled_rejection/', {}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(403);
+      expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
+      expect(result).to.exist;
+      expect(result).to.be.an('object');
+      expect(result.error).to.exist;
+      expect(result.error).to.be.an('object');
+      expect(result.error.type).to.equal('RuntimeError');
+      expect(result.error.message).to.equal('crap x2');
       done();
 
     });
