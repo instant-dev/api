@@ -360,4 +360,138 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
+  it('Should reject the type "boolean|string" options with an integer', done => {
+    
+    request('POST', {}, '/esm/alternate_types/', {value: 1}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details).to.exist;
+      expect(result.error.details.value).to.exist;
+      done();
+
+    });
+
+  });
+
+  it('Should sanitize the type "boolean|string" to a string', done => {
+    
+    request('POST', {}, '/esm/alternate_types/?value=lol', '', (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.value).to.equal('lol');
+      done();
+
+    });
+
+  });
+
+  it('Should sanitize the type "boolean|string" to a boolean', done => {
+    
+    request('POST', {}, '/esm/alternate_types/?value=true', '', (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.value).to.equal(true);
+      done();
+
+    });
+
+  });
+
+  it('Should sanitize the type "boolean|string" to a boolean (t)', done => {
+    
+    request('POST', {}, '/esm/alternate_types/?value=t', '', (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.value).to.equal(true);
+      done();
+
+    });
+
+  });
+
+  it('Should accept a string with size restriction between 2 and 5 with length', done => {
+    
+    request('POST', {}, '/esm/sizes/', {mystr: 'lol'}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result.mystr).to.equal('lol');
+      done();
+
+    });
+
+  });
+
+  it('Should reject a string with size restriction between 2 and 5 with length 1', done => {
+    
+    request('POST', {}, '/esm/sizes/', {mystr: 'l'}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details['mystr'].message).to.contain('greater than or equal to 2');
+      done();
+
+    });
+
+  });
+
+  it('Should reject a string with size restriction between 2 and 5 with length 6', done => {
+    
+    request('POST', {}, '/esm/sizes/', {mystr: 'lolwat'}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details['mystr'].message).to.contain('less than or equal to 5');
+      done();
+
+    });
+
+  });
+
 };
