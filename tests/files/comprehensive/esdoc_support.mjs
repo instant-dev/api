@@ -10,16 +10,18 @@
  * @param {array<array<number{20,30}>>{1..3}} gamma
  * @param {boolean|string} boolstring
  * @param {array{5}|"jazzhands"|5.9|boolean} mystery
+ * @param {number|"hello"|"goodbye"} hg
  * @returns {object} response
  */
-export default async (alpha, beta, gamma, boolstring, mystery) => {
+export default async (alpha, beta, gamma, boolstring, mystery, hg = 5.2) => {
   
   return {
     alpha,
     beta,
     gamma,
     boolstring,
-    mystery
+    mystery,
+    hg
   };
 
 }

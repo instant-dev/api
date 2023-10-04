@@ -1207,6 +1207,22 @@ describe('Instant API', () => {
               type: 'boolean'
             }
           ]
+        },
+        {
+          name: 'hg',
+          description: '',
+          type: 'string',
+          defaultValue: 5.2,
+          options: {
+            values: ['hello', 'goodbye']
+          },
+          alternateTypes: [
+            {
+              name: '',
+              description: '',
+              type: 'number'
+            }
+          ]
         }
       ];
 
