@@ -1185,6 +1185,27 @@ describe('Instant API', () => {
               type: 'string'
             }
           ]
+        },
+        {
+          name: 'mystery',
+          description: '',
+          type: 'any',
+          options: {
+            values: ["jazzhands", 5.9]
+          },
+          alternateTypes: [
+            {
+              name: '',
+              description: '',
+              type: 'array',
+              size: {min: 5, max: 5}
+            },
+            {
+              name: '',
+              description: '',
+              type: 'boolean'
+            }
+          ]
         }
       ];
 
