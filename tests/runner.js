@@ -1223,6 +1223,39 @@ describe('Instant API', () => {
               type: 'number'
             }
           ]
+        },
+        {
+          name: 'a1',
+          description: '',
+          type: 'array',
+          schema: [
+            {
+              name: '',
+              description: '',
+              type: 'string'
+            }
+          ]
+        },
+        {
+          name: 'a2',
+          description: '',
+          type: 'array',
+          size: {min: 2, max: 7},
+          schema: [
+            {
+              name: '',
+              description: '',
+              type: 'array',
+              size: {min: 5, max: 5},
+              schema: [
+                {
+                  name: '',
+                  description: '',
+                  type: 'buffer'
+                }
+              ]
+            }
+          ]
         }
       ];
 
