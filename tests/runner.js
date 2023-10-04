@@ -91,8 +91,9 @@ describe('Instant API', () => {
       expect(definitions).to.haveOwnProperty('esm_named#PUT');
       expect(definitions).to.haveOwnProperty('esm_named#DELETE');
       expect(definitions).to.not.haveOwnProperty('esm_named');
+      expect(definitions).to.haveOwnProperty('esdoc_support');
 
-      expect(Object.keys(definitions).length).to.equal(30);
+      expect(Object.keys(definitions).length).to.equal(31);
 
     });
 
@@ -123,6 +124,10 @@ describe('Instant API', () => {
       expect(definitions['enum_nested_optional'].pathname).to.equal('enum_nested_optional.js');
       expect(definitions['options'].pathname).to.equal('options.js');
       expect(definitions['inline'].pathname).to.equal('inline.js');
+      expect(definitions['esm_named#GET'].pathname).to.equal('esm_named.mjs');
+      expect(definitions['esm_named#POST'].pathname).to.equal('esm_named.mjs');
+      expect(definitions['esm_named#PUT'].pathname).to.equal('esm_named.mjs');
+      expect(definitions['esm_named#DELETE'].pathname).to.equal('esm_named.mjs');
 
     });
 
@@ -1099,6 +1104,71 @@ describe('Instant API', () => {
 
       expect(params).to.deep.equal(schemaCheck);
       expect(returns).to.deep.equal(schemaCheck[0]);
+
+    });
+
+    it('Should read "esdoc_support" parameters', () => {
+
+      let params = definitions['esdoc_support'].params;
+      let returns = definitions['esdoc_support'].returns;
+      let schemaCheck = [
+        {
+          name: 'alpha',
+          description: '',
+          type: 'string'
+        },
+        {
+          name: 'beta',
+          description: '',
+          type: 'object',
+          schema: [
+            {
+              name: 'num',
+              description: '',
+              type: 'number'
+            },
+            {
+              name: 'obj',
+              description: '',
+              type: 'object',
+              schema: [
+                {
+                  name: 'num',
+                  description: '',
+                  type: 'number',
+                  range: {min: 1, max: 100}
+                },
+                {
+                  name: 'float',
+                  description: '',
+                  type: 'number',
+                  range: {min: 1.1, max: 2.1}
+                },
+                {
+                  name: 'str',
+                  description: '',
+                  type: 'string',
+                  size: {min: 2, max: 7}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'gamma',
+          description: '',
+          type: 'array'
+        }
+      ];
+
+      let returnsCheck = {
+        name: 'response',
+        description: '',
+        type: 'object'
+      };
+
+      expect(params).to.deep.equal(schemaCheck);
+      expect(returns).to.deep.equal(returnsCheck);
 
     });
 
