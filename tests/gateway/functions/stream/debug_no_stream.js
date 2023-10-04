@@ -4,15 +4,15 @@
 */
 module.exports = async (alpha, context) => {
 
-  console.log('what?', 'who?');
+  context.log('what?', 'who?');
 
   await new Promise(resolve => setTimeout(() => resolve(), 20));
 
-  console.error('oh no');
+  context.error('oh no');
 
   await new Promise(resolve => setTimeout(() => resolve(), 20));
 
-  console.log('finally');
+  context.log('finally');
 
   return true;
 
