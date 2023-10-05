@@ -69,6 +69,8 @@ describe('Instant API', () => {
       expect(definitions).to.haveOwnProperty('named_return');
       expect(definitions).to.haveOwnProperty('noname_return');
       expect(definitions).to.haveOwnProperty('nullable_return');
+      expect(definitions).to.haveOwnProperty('dir');
+      expect(definitions).to.haveOwnProperty('dir:notfound');
       expect(definitions).to.haveOwnProperty('dir/test');
       expect(definitions).to.haveOwnProperty('dir/sub');
       expect(definitions).to.haveOwnProperty('dir/sub/test');
@@ -93,7 +95,7 @@ describe('Instant API', () => {
       expect(definitions).to.not.haveOwnProperty('esm_named');
       expect(definitions).to.haveOwnProperty('esdoc_support');
 
-      expect(Object.keys(definitions).length).to.equal(31);
+      expect(Object.keys(definitions).length).to.equal(33);
 
     });
 
@@ -111,6 +113,8 @@ describe('Instant API', () => {
       expect(definitions['returns'].pathname).to.equal('returns.js');
       expect(definitions['default'].pathname).to.equal('default.js');
       expect(definitions['multiline_description'].pathname).to.equal('multiline_description.js');
+      expect(definitions['dir'].pathname).to.equal('dir/index.js');
+      expect(definitions['dir:notfound'].pathname).to.equal('dir/404.js');
       expect(definitions['dir/test'].pathname).to.equal('dir/test.js');
       expect(definitions['dir/sub'].pathname).to.equal('dir/sub/__main__.js');
       expect(definitions['dir/sub/test'].pathname).to.equal('dir/sub/test.js');
