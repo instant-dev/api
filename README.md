@@ -1,7 +1,7 @@
 # Instant API
 
-![travis-ci build](https://travis-ci.org/instant-devs/api.svg?branch=master)
-![npm version](https://badge.fury.io/js/@instant.dev/api.svg)
+![travis-ci build](https://travis-ci.org/instant-dev/api.svg?branch=main)
+![npm version](https://img.shields.io/npm/v/@instant.dev/api?label=)
 
 ## An API gateway and framework for turning functions into web services
 
