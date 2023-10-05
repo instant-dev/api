@@ -30,9 +30,9 @@ hidden, but the parameters for the API can be seen.
 * @param {number} limit.offset The offset of records to begin at
 * @param {number} limit.count The number of records to return, 0 will return all
 * @returns {object} selectQueryResult
-* @ {string} spreadsheetId
-* @ {string} range
-* @ {array} rows An array of objects corresponding to row values
+* @returns {string} selectQueryResult.spreadsheetId
+* @returns {string} selectQueryResult.range
+* @returns {array}  selectQueryResultrows An array of objects corresponding to row values
 */
 export default async (
   spreadsheetId = null,

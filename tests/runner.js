@@ -1262,7 +1262,26 @@ describe('Instant API', () => {
       let returnsCheck = {
         name: 'response',
         description: '',
-        type: 'object'
+        type: 'object',
+        schema: [
+          {
+            name: 'a',
+            description: '',
+            type: 'number'
+          },
+          {
+            name: 'b',
+            description: '',
+            type: 'object',
+            schema: [
+              {
+                name: 'c',
+                description: '',
+                type: 'string'
+              }
+            ]
+          }
+        ]
       };
 
       expect(params).to.deep.equal(schemaCheck);

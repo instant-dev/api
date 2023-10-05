@@ -14,6 +14,9 @@
  * @param {string[]} a1
  * @param {buffer[5][2..7]} a2
  * @returns {object} response
+ * @returns {number} response.a
+ * @returns {object} response.b
+ * @returns {string} response.b.c
  */
 export default async (alpha, beta, gamma, boolstring, mystery, hg = 5.2, a1, a2) => {
   
