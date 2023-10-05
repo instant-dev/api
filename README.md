@@ -32,7 +32,7 @@ hidden, but the parameters for the API can be seen.
 * @returns {object} selectQueryResult
 * @returns {string} selectQueryResult.spreadsheetId
 * @returns {string} selectQueryResult.range
-* @returns {array}  selectQueryResultrows An array of objects corresponding to row values
+* @returns {array}  selectQueryResult.rows An array of objects corresponding to row values
 */
 export default async (
   spreadsheetId = null,
