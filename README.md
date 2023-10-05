@@ -5,6 +5,9 @@
 
 ## An API gateway and framework for turning functions into web services
 
+**NOTE**: This README is being modernized. Expect singificant updates with 0.1.0,
+expected by October 11th, 2023.
+
 Instant API is a framework for turning JavaScript functions into typed HTTP APIs.
 It allows JavaScript (Node.js) functions to be seamlessly exported as HTTP APIs by
 **defining what the HTTP interface will look like and how it behaves in the preceding comment block**,
@@ -21,19 +24,17 @@ hidden, but the parameters for the API can be seen.
 * Select Rows from a Spreadsheet by querying it like a Database
 * @param {string} spreadsheetId The id of the Spreadsheet.
 * @param {string} range The A1 notation of the values to use as a table.
-* @param {enum} bounds Specify the ending bounds of the table.
-*   ["FIRST_EMPTY_ROW", "FIRST_EMPTY_ROW"]
-*   ["FULL_RANGE", "FULL_RANGE"]
+* @param {"FIRST_EMPTY_ROW"|"FULL_RANGE"} bounds Specify the ending bounds of the table.
 * @param {object} where A list of column values to filter by.
 * @param {object} limit A limit representing the number of results to return
-* @ {number} offset The offset of records to begin at
-* @ {number} count The number of records to return, 0 will return all
+* @param {number} limit.offset The offset of records to begin at
+* @param {number} limit.count The number of records to return, 0 will return all
 * @returns {object} selectQueryResult
 * @ {string} spreadsheetId
 * @ {string} range
 * @ {array} rows An array of objects corresponding to row values
 */
-module.exports = async (
+export default async (
   spreadsheetId = null,
   range,
   bounds = 'FIRST_EMPTY_ROW',
@@ -101,12 +102,12 @@ In order to use Instant API, you'd set up your own [Instant API Gateway](#instan
 Instant API allows you to turn something like this...
 
 ```javascript
-// hello_world.js
+// hello_world.mjs
 
 /**
 * My hello world function!
 */
-module.exports = (name = 'world') => {
+export default async (name = 'world') => {
 
   return `hello ${name}`;
 
@@ -151,7 +152,7 @@ on your own.
 
 ## All Available Types
 
-Here's an example of a hypothetical `createUser.js` function that can be used
+Here's an example of a hypothetical `createUser.mjs` function that can be used
 to create a user resource. It includes all available type definitions.
 
 ```javascript
@@ -172,7 +173,7 @@ to create a user resource. It includes all available type definitions.
 * @param {boolean} overwrite Overwrite current user data, if username matching
 * @returns {object.http} successPage API Returns an HTTP object (webpage)
 */
-module.exports = async (id = null, username, age, communityScore, metadata, friendsIds = [], profilePhoto, userGroup, overwrite = false) => {
+export default async (id = null, username, age, communityScore, metadata, friendsIds = [], profilePhoto, userGroup, overwrite = false) => {
 
   // NOTE: id, friendIds and overwrite will be OPTIONAL as they have each been
   //       provided a defaultValue
@@ -197,13 +198,13 @@ module.exports = async (id = null, username, age, communityScore, metadata, frie
 ## Instant API Resource Definition
 
 An Instant API definition is a JSON output, traditionally saved as a
-`definition.json` file, generated from a JavaScript file,
+`definition.mjson` file, generated from a JavaScript file,
 that respects the following format.
 
-Given a function like this (filename `my_function.js`):
+Given a function like this (filename `my_function.mjs`):
 
 ```javascript
-// my_function.js
+// my_function.mjs
 
 /**
 * This is my function, it likes the greek alphabet
@@ -212,12 +213,12 @@ Given a function like this (filename `my_function.js`):
 * @param {Boolean} gamma True or false?
 * @returns {Object} some value
 */
-module.exports = async (alpha, beta = 2, gamma, context) => {
+export default async (alpha, beta = 2, gamma, context) => {
   /* your code */
 };
 ```
 
-The Instant API parser will generate a `definition.json` file that looks
+The Instant API parser will generate a `definition.mjson` file that looks
 like the following:
 
 ```json
@@ -342,22 +343,22 @@ All types are potentially nullable, an nullability can be defined in two ways:
 
 **(1)** by setting `"defaultValue": null` in the `NamedParameter` definition.
 
-```
+```javascript
 /**
 * @param {string} nullableString
 */
-module.exports = (nullableString = null) => {
+export default async (nullableString = null) => {
   return `Test ${nullableString}`;
 }
 ```
 
 **(2)** By prepending a `?` before the type name in the comment definition, i.e.:
 
-```
+```javascript
 /**
 * @param {?string} nullableString
 */
-module.exports = (nullableString) => {
+export default async (nullableString) => {
   return `Test ${nullableString}`;
 }
 ```
@@ -381,7 +382,7 @@ For example, to return an image that's of type `image/png`...
 * @param {string} imageName The name of the image
 * @returns {object.http} image The result
 */
-module.exports = (imageName) => {
+export default async (imageName) => {
 
   // fetch image, returns a buffer
   let png = imageName === 'cat' ?
