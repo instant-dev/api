@@ -1,6 +1,6 @@
 {
   "name": "@instant.dev/api",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An API gateway and framework for turning functions into web services",
   "author": "Keith Horwood <keithwhor@gmail.com>",
   "main": "index.js",
@@ -17,7 +17,7 @@
     "keyql": "^0.2.2",
     "mime": "^2.5.2",
     "minimatch": "^3.0.4",
-    "uuid": "^3.0.1"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
