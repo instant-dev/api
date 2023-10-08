@@ -22,9 +22,20 @@ describe('Instant API', () => {
 
   const instantModule = require('../index.js');
   const FunctionParser = instantModule.FunctionParser;
+  const EncryptionTools = instantModule.EncryptionTools;
   const parser = new FunctionParser();
   const NodeJsFunctionParser = new FunctionParser.parsers['nodejs']();
   const types = instantModule.types;
+
+  describe('Exports', () => {
+
+    it('should load EncryptionTools', () => {
+
+      expect(EncryptionTools).to.exist;
+
+    });
+
+  });
 
   describe('Function Validation', () => {
 
