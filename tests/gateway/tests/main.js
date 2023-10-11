@@ -61,7 +61,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
-  it('Should return 404 + ClientError for not found function', done => {
+  it('Should return 404 + NotFoundError for not found function', done => {
     request('GET', {}, '/', '', (err, res, result) => {
 
       expect(err).to.not.exist;
@@ -71,7 +71,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(result).to.exist;
       expect(result.error).to.exist;
-      expect(result.error.type).to.equal('ClientError');
+      expect(result.error.type).to.equal('NotFoundError');
       done();
 
     });
@@ -1414,7 +1414,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       FaaSGateway.resolve = originalResolveFn;
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(401);
+      expect(res.statusCode).to.equal(503);
       expect(result.error).to.exist;
       expect(result.error.type).to.equal('OwnerSuspendedError');
       done();
@@ -1437,7 +1437,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       FaaSGateway.resolve = originalResolveFn;
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(401);
+      expect(res.statusCode).to.equal(503);
       expect(result.error).to.exist;
       expect(result.error.type).to.equal('OwnerPaymentRequiredError');
       done();
@@ -1644,7 +1644,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1661,7 +1661,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/details/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1728,7 +1728,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/thrown/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1744,7 +1744,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/promise_uncaught/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1761,7 +1761,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/promise_unhandled_rejection/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1778,7 +1778,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/array/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1794,7 +1794,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/boolean/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1810,7 +1810,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/number/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1826,7 +1826,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/object/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
@@ -1842,7 +1842,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     request('POST', {}, '/runtime/string/', {}, (err, res, result) => {
 
       expect(err).to.not.exist;
-      expect(res.statusCode).to.equal(403);
+      expect(res.statusCode).to.equal(400);
       expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
       expect(result).to.exist;
       expect(result).to.be.an('object');
