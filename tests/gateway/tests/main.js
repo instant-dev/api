@@ -1735,6 +1735,24 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(result.error).to.exist;
       expect(result.error).to.be.an('object');
       expect(result.error.type).to.equal('RuntimeError');
+      expect(result.error.message).to.equal('crap');
+      done();
+
+    });
+  });
+
+  it('Should register a thrown error properly with a status code in message', done => {
+    request('POST', {}, '/runtime/thrown_status/', {}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(401);
+      expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
+      expect(result).to.exist;
+      expect(result).to.be.an('object');
+      expect(result.error).to.exist;
+      expect(result.error).to.be.an('object');
+      expect(result.error.type).to.equal('UnauthorizedError');
+      expect(result.error.message).to.equal('crap');
       done();
 
     });
