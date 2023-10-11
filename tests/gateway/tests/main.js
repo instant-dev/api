@@ -87,6 +87,8 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers).to.haveOwnProperty('location');
       expect(res.headers.location).to.equal('/my_function/');
+      expect(result.toString()).to.be.a('string');
+      expect(result.toString()).to.satisfy(s => s.startsWith('You are being redirected to: '));
       done();
 
     });
