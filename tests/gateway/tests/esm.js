@@ -494,4 +494,80 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
+  it('Should reject an integer with invalid entry in range restriction {1,}', done => {
+    
+    request('POST', {}, '/esm/left_range/', {myval: 0}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details['myval'].message).to.contain('greater than or equal to 1');
+      done();
+
+    });
+
+  });
+
+  it('Should accept an integer with valid entry in range restriction {1,}', done => {
+    
+    request('POST', {}, '/esm/left_range/', {myval: 1}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result).to.deep.equal({myval: 1});
+      done();
+
+    });
+
+  });
+
+  it('Should reject an integer with invalid entry in range restriction {,1}', done => {
+    
+    request('POST', {}, '/esm/right_range/', {myval: 2}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result.error).to.exist;
+      expect(result.error.details['myval'].message).to.contain('less than or equal to 1');
+      done();
+
+    });
+
+  });
+
+  it('Should accept an integer with valid entry in range restriction {,1}', done => {
+    
+    request('POST', {}, '/esm/right_range/', {myval: 1}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+
+      expect(result).to.exist;
+      expect(result).to.deep.equal({myval: 1});
+      done();
+
+    });
+
+  });
+
 };
