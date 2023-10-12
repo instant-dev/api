@@ -7,6 +7,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -25,6 +26,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -43,6 +45,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -61,6 +64,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -79,6 +83,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -97,6 +102,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -115,6 +121,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -133,6 +140,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -151,6 +159,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -169,6 +178,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(501);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -186,6 +196,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -208,6 +219,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -230,6 +242,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -252,6 +265,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -309,6 +323,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -329,6 +344,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -348,6 +364,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -367,6 +384,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -387,6 +405,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -406,6 +425,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -425,6 +445,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -444,6 +465,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -463,6 +485,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -482,6 +505,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -501,6 +525,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -520,6 +545,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -539,6 +565,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(400);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
@@ -558,6 +585,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(err).to.not.exist;
       expect(res.statusCode).to.equal(200);
       expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
       expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
       expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
       expect(res.headers['content-type']).to.equal('application/json');
