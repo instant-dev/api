@@ -38,6 +38,25 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
 
   });
 
+  it('Should fail to execute a DELETE-exported ESM function with DELETE when body provided', done => {
+    
+    request('DELETE', {}, '/esm/default/', {str: 'ABC ', repeat: 10}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(res.headers['content-type']).to.equal('application/json');
+      expect(result.error.message).to.contain('SHOULD NOT generate content in a DELETE request');
+
+      done();
+
+    });
+
+  });
+
   it('Should successfully execute a default-exported ESM function with POST', done => {
     
     request('POST', {}, '/esm/default/', {str: 'ABC ', repeat: 10}, (err, res, result) => {

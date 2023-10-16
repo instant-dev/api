@@ -74,6 +74,8 @@ function request (method, headers, path, data, callback) {
     });
     res.on('error', err => callback(err));
   });
+  // Allow passing in body to HTTP DELETE
+  req.useChunkedEncodingByDefault = true;
   req.end(data);
 }
 
