@@ -1637,6 +1637,34 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     });
   });
 
+  it('Should register a fatal error properly and catch in the error handler', done => {
+
+    let error;
+    FaaSGateway.setErrorHandler(e => error = e);
+
+    request('POST', {}, '/runtime/fatal/', {}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(500);
+      expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
+      expect(result).to.exist;
+      expect(result).to.be.an('object');
+      expect(result.error).to.exist;
+      expect(result.error).to.be.an('object');
+      expect(result.error.type).to.equal('FatalError');
+      expect(result.error.stack).to.exist;
+
+      expect(error).to.exist;
+      expect(error.message).to.equal(result.error.message);
+      expect(error.stack).to.equal(result.error.stack);
+
+      FaaSGateway.setErrorHandler(() => {});
+
+      done();
+
+    });
+  });
+
   it('Should register a fatal error with no stack properly', done => {
     request('POST', {}, '/runtime/fatal_no_stack/', {}, (err, res, result) => {
 
