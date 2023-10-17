@@ -5522,6 +5522,7 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
         }
       });
       expect(result.paths['/a_standard_function/']).to.exist;
+      expect(result.paths['/my_function_private/']).to.not.exist;
       expect(result.paths['/reflect/']).to.exist;
       done();
 
@@ -5556,6 +5557,9 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(result).to.exist;
       expect(result.functions).to.exist;
       expect(result.functions.length).to.be.greaterThan(1);
+      expect(result.functions.find(fn => fn.name === 'my_function')).to.exist;
+      expect(result.functions.find(fn => fn.name === 'my_function_private')).to.not.exist;
+
       done();
 
     });
