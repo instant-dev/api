@@ -161,6 +161,38 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
     });
   });
 
+  it('Should return 200 OK when different variables set in queryParams and bodyParams', done => {
+    request('POST', {}, '/my_function/?a=100', {b: 200}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(result).to.exist;
+      expect(result).to.equal(303);
+      done();
+
+    });
+  });
+
+  it('Should return 400 Bad Request + ParameterParseError when same variable set in queryParams and bodyParams', done => {
+    request('POST', {}, '/my_function/?a=1', {a: 2}, (err, res, result) => {
+
+      expect(err).to.not.exist;
+      expect(res.statusCode).to.equal(400);
+      expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+      expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+      expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+      expect(result).to.exist;
+      expect(result.error).to.exist;
+      expect(result.error.type).to.equal('ParameterParseError');
+      expect(result.error.message).to.contain('Can not specify "a" in both query and body parameters');
+      done();
+
+    });
+  });
+
   it('Should return 400 Bad Request + ParameterParseError when no Content-Type specified on POST', done => {
     request('POST', {}, '/my_function/', undefined, (err, res, result) => {
 
