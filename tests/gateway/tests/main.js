@@ -5572,7 +5572,11 @@ module.exports = (expect, FaaSGateway, parser, parseServerSentEvents, request) =
       expect(result.functions.length).to.be.greaterThan(1);
       expect(result.functions.find(fn => fn.name === 'my_function')).to.exist;
       expect(result.functions.find(fn => fn.name === 'my_function_private')).to.not.exist;
-
+      expect(result.functions.find(fn => fn.name === 'my_esm_function')).to.exist;
+      expect(result.functions.find(fn => fn.name === 'my_esm_function_get')).to.exist;
+      expect(result.functions.find(fn => fn.name === 'my_esm_function_delete')).to.exist;
+      expect(result.functions.find(fn => fn.name === 'my_esm_function_put')).to.exist;
+      expect(result.functions.find(fn => fn.name === 'my_esm_function_post')).to.not.exist;
       done();
 
     });
