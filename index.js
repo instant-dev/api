@@ -3,5 +3,6 @@ module.exports = {
   Daemon: require('./lib/daemon.js'),
   Gateway: require('./lib/gateway.js'),
   EncryptionTools: require('@instant.dev/encrypt'),
+  TestEngine: require('./lib/test_engine.js'),
   types: require('./lib/types.js')
 };

@@ -1,9 +1,11 @@
-const http = require('http');
 const zlib = require('zlib');
+const http = require('http');
 
+const InstantAPI = require('../index.js');
+
+const HOST = 'localhost';
 const PORT = 7357;
-const HOST = 'localhost'
-const ROOT = './tests/gateway';
+const ROOT = './test/gateway';
 
 function parseServerSentEvents (buffer) {
   let events = {};
@@ -13,7 +15,7 @@ function parseServerSentEvents (buffer) {
     .forEach(entry => {
       let event = '';
       let data = null;
-      let lines = entry.split('\n').map((line, i) => {
+      entry.split('\n').forEach((line, i) => {
         let lineData = line.split(':');
         let type = lineData[0];
         let contents = lineData.slice(1).join(':');
@@ -79,33 +81,11 @@ function request (method, headers, path, data, callback) {
   req.end(data);
 }
 
-module.exports = (expect, instantModule) => {
-
-  const { Gateway, FunctionParser } = instantModule;
-  const parser = new FunctionParser();
-
-  const FaaSGateway = new Gateway({
-    debug: false,
-    root: ROOT,
-    defaultTimeout: 1000
-  });
-
-  before(() => {
-    const preloadFiles = {
-      'functions/sample_preload.js': Buffer.from(`module.exports = async () => { return true; };`)
-    };
-    FaaSGateway.load(ROOT, preloadFiles);
-    FaaSGateway.listen(PORT);
-  });
-
-  describe('Main tests', () => {
-    require('./tests/main.js')(expect, FaaSGateway, parser, parseServerSentEvents, request);
-  });
-
-  describe('ESM tests', () => {
-    require('./tests/esm.js')(expect, FaaSGateway, parser, parseServerSentEvents, request);
-  })
-
-  after(() => FaaSGateway.close());
-
+module.exports = {
+  HOST,
+  PORT,
+  ROOT,
+  InstantAPI,
+  request,
+  parseServerSentEvents
 };
