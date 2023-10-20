@@ -4,7 +4,7 @@ const expect = chai.expect;
 import fs from 'fs';
 import FormData from 'form-data';
 
-import { HOST, PORT, ROOT, InstantAPI } from '../helpers.mjs';
+import { HOST, PORT, ROOT, InstantAPI } from '../../helpers.mjs';
 
 export default async function (setupResult) {
 

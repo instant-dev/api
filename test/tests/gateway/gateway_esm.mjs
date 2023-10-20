@@ -1,7 +1,7 @@
 import chai from 'chai';
 const expect = chai.expect;
 
-import { ROOT, PORT, InstantAPI } from '../helpers.mjs';
+import { ROOT, PORT, InstantAPI } from '../../helpers.mjs';
 
 export default async function (setupResult) {
 
