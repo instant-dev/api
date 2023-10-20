@@ -1,9 +1,12 @@
+import chai from 'chai';
+const expect = chai.expect;
+
 import fs from 'fs';
 import FormData from 'form-data';
 
 import { HOST, PORT, ROOT, InstantAPI } from '../helpers.mjs';
 
-export default async function (expect) {
+export default async function (setupResult) {
 
   const { Gateway, FunctionParser } = InstantAPI;
   const parser = new FunctionParser();

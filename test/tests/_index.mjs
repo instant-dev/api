@@ -1,3 +1,6 @@
+import chai from 'chai';
+const expect = chai.expect;
+
 import fs from 'fs';
 import path from 'path';
 
@@ -18,7 +21,7 @@ const cases = fs.readdirSync(CASE_PATH).map(filename => {
   }
 });
 
-export default async function (expect) {
+export default async function (setupResult) {
 
   describe('Instant API', () => {
 
