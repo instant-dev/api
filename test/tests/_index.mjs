@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const { InstantAPI } = require('../helpers.js');
+import { InstantAPI } from '../helpers.mjs';
 
 const CASE_PATH = './test/files/cases';
 const cases = fs.readdirSync(CASE_PATH).map(filename => {
@@ -18,7 +18,7 @@ const cases = fs.readdirSync(CASE_PATH).map(filename => {
   }
 });
 
-module.exports = (expect) => {
+export default async function (expect) {
 
   describe('Instant API', () => {
 

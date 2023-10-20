@@ -1,12 +1,12 @@
 {
   "name": "@instant.dev/api",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "An API gateway and framework for turning functions into web services",
   "author": "Keith Horwood <keithwhor@gmail.com>",
   "main": "index.js",
   "scripts": {
     "test": "mocha ./test/run.mjs",
-    "output": "node ./test/output.js"
+    "output": "node ./test/output.mjs"
   },
   "dependencies": {
     "@babel/parser": "^7.23.0",

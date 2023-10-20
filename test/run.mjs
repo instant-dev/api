@@ -1,12 +1,10 @@
 import chai from 'chai';
 const expect = chai.expect;
 
-import InstantAPI from '../index.js';
+import { PORT, InstantAPI } from './helpers.mjs';
 const TestEngine = InstantAPI.TestEngine;
 
-import helpers from './helpers.js';
-
-const testEngine = new TestEngine(helpers.PORT);
+const testEngine = new TestEngine(PORT);
 await testEngine.initialize('./test/tests');
 
 const args = process.argv.slice(3);

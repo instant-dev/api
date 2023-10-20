@@ -1,6 +1,6 @@
-const { ROOT, PORT, InstantAPI } = require('../helpers.js');
+import { ROOT, PORT, InstantAPI } from '../helpers.mjs';
 
-module.exports = async function (expect) {
+export default async function (expect) {
 
   const { Gateway, FunctionParser } = InstantAPI;
   const parser = new FunctionParser();
