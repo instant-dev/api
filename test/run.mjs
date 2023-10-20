@@ -4,7 +4,9 @@ const expect = chai.expect;
 import InstantAPI from '../index.js';
 const TestEngine = InstantAPI.TestEngine;
 
-const testEngine = new TestEngine();
+import helpers from './helpers.js';
+
+const testEngine = new TestEngine(helpers.PORT);
 await testEngine.initialize('./test/tests');
 
 const args = process.argv.slice(3);
