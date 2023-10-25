@@ -88,7 +88,9 @@ LLM streaming is simple. It relies on a special `context` object and defining
 `@stream` parameters to create a `text/event-stream` response. You can think
 of `@stream` as similar to `@returns`, where you're specifying the schema
 for the output to the user. If this contract is broken, your API will throw an
-error.
+error. In order to send a stream to the user, we add a special `context` object
+to the API footprint as the last parameter and use an exposed `context.stream()`
+method.
 
 File: `/functions/v1/ai-helper.mjs`
 
@@ -144,18 +146,19 @@ will be an object containing the details of what the HTTP response would have co
 had the API call been made normally.
 
 ```shell
-id: 2023-10-25T04:07:51.835000000Z/ae84ad54-e30c-4366-8ce8-b6c092362565
+id: 2023-10-25T04:29:59.115000000Z/2e7c7860-4a66-4824-98fa-a7cf71946f19
 event: @begin
-data: "2023-10-25T04:07:51.835Z"
+data: "2023-10-25T04:29:59.115Z"
 
 [... more events ...]
 
-id: 2023-10-25T04:07:52.827000000Z/ae84ad54-e30c-4366-8ce8-b6c092362565
 event: chunk
-data: {"id":"chatcmpl-8DPTMfKP7DkdV14YJceoeFB1Hpllx","object":"chat.completion.chunk","created":1698206872,"model":"gpt-3.5-turbo-0613","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+data: {"id":"chatcmpl-8DPoluIgN4TDIuE1usFOKTLPiIUbQ","object":"chat.completion.chunk","created":1698208199,"model":"gpt-3.5-turbo-0613","choices":[{"index":0,"delta":{"content":" 💯"},"finish_reason":null}]}
+
+[... more events ...]
 
 event: @response
-data: {"statusCode":200,"headers":{"X-Execution-Uuid":"ae84ad54-e30c-4366-8ce8-b6c092362565","X-Debug":true,"X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-debug, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling super duper fantastic! 💃 How about you? 😊\"}"}
+data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a7cf71946f19","X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling 💯 today! Full of energy and ready to help you out. How about you? How are you doing? 🌈😊\"}"}
 ```
 
 ## Table of Contents
@@ -166,6 +169,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"ae84ad54-e30c-4366-8ce8-b
 1. Endpoints and Type Safety
    1. Endpoint structure
       1. Creating an endpoint
+      1. `context` object
       1. API endpoints: `functions/` directory
          1. Index routing with `index.js`
          1. Wildcard routing with `404.js`
@@ -188,12 +192,18 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"ae84ad54-e30c-4366-8ce8-b
          1. enum
    1. Parameter validation
    1. Returning responses
-      1. Return type safety
-      1. Custom HTTP Response
-      1. Streaming Response
+      1. `@returns` type safety
+      1. Custom HTTP Responses
+      1. Streaming Responses
+      1. Debug Responses
    1. Throwing errors
 1. OpenAPI Specification Generation
 1. Streaming and LLM Support
+   1. `@stream` type safety
+   1. Using `context.stream()`
+   1. Using the `_stream` parameter
+1. Debugging
+   1. Using the `_debug` parameter
 1. Advanced Endpoint Management
    1. Request handling
       1. GET / DELETE
