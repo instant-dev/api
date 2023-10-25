@@ -3,7 +3,8 @@
 ![travis-ci build](https://travis-ci.org/instant-dev/api.svg?branch=main)
 ![npm version](https://img.shields.io/npm/v/@instant.dev/api?label=)
 
-## Type-safe JavaScript API Framework: Built-in spec generation and LLM streaming
+# Type-safe JavaScript API Framework
+## Built-in spec generation and LLM streaming
 
 Instant API is a framework for building APIs with JavaScript that implements
 **type-safety at the HTTP interface**. By doing so, it eliminates the need for
@@ -183,7 +184,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [Responding to HTTP methods](#responding-to-http-methods)
       1. [Endpoint lifecycle](#endpoint-lifecycle)
       1. [Typing your endpoint](#typing-your-endpoint)
-          1. [Undocument parameters](#undocumented-parameters)
+          1. [Undocumented parameters](#undocumented-parameters)
           1. [Required parameters](#required-parameters)
           1. [Optional parameters](#optional-parameters)
       1. [`context` object](#context-object)
@@ -734,11 +735,11 @@ from string to JSON successfully but fail the `object` type check.
 | string | No conversion: already a string |
 | number | Determine float value, if NaN keep as string, otherwise convert |
 | float | Determine float value, if NaN keep as string, otherwise convert |
-| integer | Determine float value, if NaN keep as string |
-| object | Parse as JSON, if invalid keep as string |
-| object.http | Parse as JSON, if invalid keep as string |
-| array | Parse as JSON, if invalid keep as string |
-| buffer | Parse as JSON, if invalid keep as string |
+| integer | Determine float value, if NaN keep as string, otherwise convert: may fail integer check |
+| object | Parse as JSON, if invalid keep as string, otherwise convert: may fail object check |
+| object.http | Parse as JSON, if invalid keep as string, otherwise convert: may fail object.http check |
+| array | Parse as JSON, if invalid keep as string, otherwise convert: may fail array check |
+| buffer | Parse as JSON, if invalid keep as string, otherwise convert: may fail buffer check |
 | any | No conversion: keep as string |
 
 #### Combining types
@@ -865,8 +866,9 @@ Would successfully define an array of integers or an array of strings.
 
 #### Object schemas
 
-To define object schemas, use the following lines of the schema to define individual properties.
-For example, the object `{"a": 1, "b": "two", "c": {"d": true, "e": []}` Could be defined like so:
+To define object schemas, use the subsequent lines of the schema after your initial object
+definition to define individual properties. For example, the object
+`{"a": 1, "b": "two", "c": {"d": true, "e": []}` Could be defined like so:
 
 ```javascript
 @param {object}  myObject
