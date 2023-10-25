@@ -3,19 +3,30 @@
 ![travis-ci build](https://travis-ci.org/instant-dev/api.svg?branch=main)
 ![npm version](https://img.shields.io/npm/v/@instant.dev/api?label=)
 
-## Type-safe JavaScript API Framework with built-in LLM Streaming Support
+## Type-safe JavaScript API Framework: Built-in spec generation and LLM streaming
 
 Instant API is a framework for building APIs with JavaScript that implements
 **type-safety at the HTTP interface**. By doing so, it eliminates the need for
 schema validation libraries entirely. Simply write a JSDoc-compliant specification
-for your API endpoint and never worry about validating user input manually ever
-again.
+for your API endpoint and stop worrying about validation and testing for user input.
+The OpenAPI specification for your API is then automatically generated in both
+JSON and YAML at `/.well-know/openapi.json` and `/.well-known/openapi.yaml`.
+
+Additionally, Instant API comes packaged with LLM-focused features to future-proof your
+API in preparation for AI integration. First class support for `text/event-stream` makes
+streaming LLM responses easy,
+[LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) is
+a breeze via a list of your API functions available at at `/.well-known/functions.json`,
+and experimental auto-generation of `/.well-known/ai-plugin.json` enables rapid integration
+into AI platforms like OpenAI plugins.
+
+## Features
 
 Instant API comes with the following features;
 
 - Parameter validation (query and body) based on JSDoc specification
   - e.g. `@param {string{5..25}} title` ensures titles is a string between 5 and 25 characters
-- Serverless-style routing for endpoints: one function = one endpoint
+- Function-based routing for endpoints: one function = one endpoint
   - `/functions/v1/path-to/file.mjs` => `example.com/v1/path-to/file`
 - Automatic generation of OpenAPI specification for your endpoints
   - `/.well-known/openapi.json` and `/.well-known/openapi.yaml`
@@ -125,6 +136,7 @@ export async function GET (query, context) {
   });
   const messages = [];
   for await (const chunk of completion) {
+    // Stream our response as text/event-stream when ?_stream parameter added
     context.stream('chunk', chunk); // chunk has the schema provided above
     messages.push(chunk?.choices?.[0]?.delta?.content || '');
   }
@@ -133,13 +145,14 @@ export async function GET (query, context) {
 ```
 
 By default, this method will return something like;
+
 ```json
 {
   "content": "Hey there! 💁‍♀️ I'm doing great, thank you! 💖✨ How about you? 😊🌈"
 }
 ```
 
-However, if you append `&_stream` to query parameters or `{"_stream": true}` to
+However, if you append `?_stream` to query parameters or `{"_stream": true}` to
 body parameters, it will turn into a `text/event-stream` with your `context.stream()`
 events sandwiched between a `@begin` and `@response` event. The `@response` event
 will be an object containing the details of what the HTTP response would have contained
@@ -180,20 +193,15 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
       1. [Static files: `www/` directory](#static-files-www-directory)
          1. [Index routing with `index.html`](#index-routing-with-indexhtml)
          1. [Subdirectory routing with `404.html`](#subdirectory-routing-with-404html)
-   1. Supported types
-      1. any
-      1. boolean
-      1. string
-      1. number
-      1. float
-      1. integer
-      1. boolean
-      1. array
-      1. object
-         1. object.http
-      1. buffer
-      1. other
-         1. enum
+   1. [Type Safety](#type-safety)
+      1. [Supported types](#supported-types)
+      1. [Type coercion](#type-coercion)
+      1. [Combining types](#combining-types)
+      1. [Enums and restricting to specific values](#enums-and-restricting-to-specific-values)
+      1. [Sizes (lengths)](#sizes-lengths)
+      1. [Ranges](#ranges)
+      1. [Arrays](#arrays)
+      1. [Object schemas](#object-schemas)
    1. Parameter validation
    1. Returning responses
       1. `@returns` type safety
@@ -235,7 +243,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
 ### Quickstart
 
 The quickest way to get started with Instant API is via the
-[`instant.dev` command line tools](https://github.com/instant-dev/instant.dev).
+`instant.dev` [command line tools](https://github.com/instant-dev/instant.dev).
 It is the easiest way to get your Instant API project set up, generate new endpoints,
 manage tests and comes with built-in deployment tooling for Vercel or AWS.
 It comes packaged with the [Instant ORM](https://github.com/instant-dev/orm) which
@@ -261,7 +269,7 @@ instant serve
 # Run tests
 instant test
 
-# See all available command
+# See all available commands
 instant help
 ```
 
@@ -362,7 +370,7 @@ Assuming you are running `instant serve` or `npm start` on port `8000`. See
 
 In the example above, we used `export default` to export a default function.
 This function will respond to to all `GET`, `POST`, `PUT` and `DELETE` requests
-with the same function. Alternatively, we can export methods for each method individually,
+with the same function. Alternatively, we can export functions for each method individually,
 like so:
 
 File: `functions/index.js`
@@ -383,24 +391,26 @@ Any method not specified in this manner will automatically return an HTTP 501 er
 ```shell
 curl -X GET localhost:8000/
 > "this was a GET request!"
+
 curl -X POST localhost:8000/
 > "this was a POST request!"
+
 curl -X PUT localhost:8000/
 > {"error":...} # Returns NotImplementedError (501)
 ```
 
-Note that the function names are **case sensitive**, they **must** be uppercase.
+**Note:** Method names are **case sensitive**, they **must** be uppercase.
 Instant API will throw an error if the exports aren't read properly.
 
 #### Endpoint lifecycle
 
 When endpoint files, like `functions/index.js` above, are accessed they
-are imported **only once** per process. Any code outside of the `export` statements
-is executed lazily the first time the function is executed per process. By default,
+are imported **only once per process**. Code outside of `export` statements
+is executed lazily the first time the function is executed. By default,
 in a production server environment, Instant API will start one process per virtual core.
 
 Each exported function will be executed every time it is called. For the most part,
-you should only use the area outside of the `export` statement for critical library
+you should only use the area external to your `export` statements for critical library
 imports and frequently accessed object caching; **not for data persistence**.
 
 Here's an example using [Instant ORM](https://github.com/instant-dev/orm):
@@ -473,10 +483,13 @@ but must be a `number`.
 ```shell
 curl -X GET localhost:8000/
 > {"error":...} # Returns ParameterError (400) -- name is required
+
 curl -X GET localhost:8000/?name=world
 > "hello world you are 25"
+
 curl -X GET localhost:8000/?name=world&age=lol
 > {"error":...} # Returns ParameterError (400) -- age should be a number
+
 curl -X GET localhost:8000/?name=world&age=99
 > "hello world you are 99"
 ```
@@ -501,6 +514,7 @@ parameter is required if no `name` is passed in to the endpoint.
 ```shell
 curl -X GET localhost:8000/
 > {"error":...} # Returns ParameterError (400)
+
 curl -X GET localhost:8000/?name=world
 > "hello world"
 ```
@@ -535,8 +549,10 @@ printed as the string `"null"`.
 ```shell
 curl -X GET localhost:8000/
 > "hello null, you are 4200000000"
+
 curl -X GET localhost:8000/?name=world
 > "hello world, you are 4200000000"
+
 curl -X GET localhost:8000/?name=world&age=101
 > "hello world, you are 101"
 ```
@@ -555,7 +571,7 @@ You can use `context` to access execution-specific information like so;
 ```javascript
 export async function GET (context) {
   console.log(context.http.method);   // "GET"
-  console.log(context.http.body);     // Raw body (Buffer)
+  console.log(context.http.body);     // Request body (utf8)
   console.log(context.remoteAddress); // IP address
   return context;                     // ... and much more
 }
@@ -568,18 +584,18 @@ A full list of available properties is as follows;
 
 ```javascript
 {
-  "name": "{endpoint_name}",
-  "alias": "{request_pathname}",
+  "name": "endpoint_name",
+  "alias": "request_pathname",
   "path": ["request_pathname", "split", "by", "/"],
   "params": {"jsonified": "params", "passed": "via_query_and_body"},
-  "remoteAddress": "{ipv4_or_v6_address}",
-  "uuid": "{request_uuid}",
+  "remoteAddress": "ipv4_or_v6_address",
+  "uuid": "request_uuid",
   "http": {
-    "url": "{request_url}",
-    "method": "{request_method}",
+    "url": "request_url",
+    "method": "request_method",
     "headers": {"request": "headers"},
-    "body": "{request_body_utf8}",
-    "json": "{request_body_json_if_applicable}",
+    "body": "request_body_utf8",
+    "json": "request_body_json_if_applicable_else_null",
   },
   "stream": function stream (name, value) { /* ... */ }
 }
@@ -668,61 +684,209 @@ Alias: `404.htm`
 Same behavior as `404.js` for API routes. Handler for subdirectories that are
 not otherwise defined. Ideal use case is for custom 404 error pages.
 
-### Supported types
+### Type Safety
 
-[ DOCUMENTATION IN PROGRESS ]
+Types are applied to parameter and schema validation based upon the comment block
+preceding your exported endpoint function.
 
-#### any
+```javascript
+/**
+ * My GET endpoint
+ * @param {any} myparam
+ */
+export async function GET (myparam) {
+  // do something with myparam
+}
+```
 
+#### Supported types
 
+| Type | Definition | Example Parameter Input Values (JSON) |
+| ---- | ---------- | -------------- |
+| boolean | True or False | `true` or `false` |
+| string | Basic text or character strings | `"hello"`, `"GOODBYE!"` |
+| number | Any double-precision [Floating Point](https://en.wikipedia.org/wiki/IEEE_floating_point) value | `2e+100`, `1.02`, `-5` |
+| float | Alias for `number` | `2e+100`, `1.02`, `-5` |
+| integer | Subset of `number`, integers between `-2^53 + 1` and `+2^53 - 1` (inclusive) | `0`, `-5`, `2000` |
+| object | Any JSON-serializable Object | `{}`, `{"a":true}`, `{"hello":["world"]}` |
+| object.http | An object representing an HTTP Response. Accepts `headers`, `body` and `statusCode` keys | `{"body": "Hello World"}`, `{"statusCode": 404, "body": "not found"}`, `{"headers": {"Content-Type": "image/png"}, "body": Buffer.from(...)}` |
+| array | Any JSON-serializable Array | `[]`, `[1, 2, 3]`, `[{"a":true}, null, 5]` |
+| buffer | Raw binary octet (byte) data representing a file. | `{"_bytes": [8, 255]}` or `{"_base64": "d2h5IGRpZCB5b3UgcGFyc2UgdGhpcz8/"}` |
+| any | Any value mentioned above | `5`, `"hello"`, `[]` |
 
-#### boolean
+#### Type coercion
 
+The `buffer` type will automatically be converted to a `Buffer` from any `object` with a
+**single key-value pair matching the footprints** `{"_bytes": []}` or `{"_base64": ""}`.
 
+Otherwise, parameters provided to a function are expected to match their
+defined types. Requests made over HTTP GET via query parameters or POST data
+with type `application/x-www-form-urlencoded` will be automatically
+converted from strings to their respective expected types, when possible.
 
-#### string
+Once converted, all types will undergo a final type validation. For example, passing
+a JSON `array` like `["one", "two"]` to a parameter that expects an `object` will convert
+from string to JSON successfully but fail the `object` type check.
 
+| Type | Conversion Rule |
+| ---- | --------------- |
+| boolean | `"t"` and `"true"` become `true`, `"f"` and `"false"` become `false`, otherwise will be kept as string |
+| string | No conversion: already a string |
+| number | Determine float value, if NaN keep as string, otherwise convert |
+| float | Determine float value, if NaN keep as string, otherwise convert |
+| integer | Determine float value, if NaN keep as string |
+| object | Parse as JSON, if invalid keep as string |
+| object.http | Parse as JSON, if invalid keep as string |
+| array | Parse as JSON, if invalid keep as string |
+| buffer | Parse as JSON, if invalid keep as string |
+| any | No conversion: keep as string |
 
+#### Combining types
 
-#### number
+You can combine types using the pipe `|` operator. For example;
 
+```javascript
+/**
+ * @param {string|integer} myparam String or an integer
+ */
+export async function GET (myparam) {
+  // do something
+} 
+```
 
+Will accept a `string` or an `integer`. Types defined this way will validate against
+the provided types in order of appearance. In this case, since it is a GET request and
+all parameters are passed in as strings via query parameters, `myparam` will **always**
+be received a string because it will successfully pass the string type coercion and
+validation first.
 
-#### float
+However, if you use a POST request:
 
+```javascript
+/**
+ * @param {string|integer} myparam String or an integer
+ */
+export async function POST (myparam) {
+  // do something
+} 
+```
 
+Then you can pass in `{"myparam": "1"}` or `{"myparam": 1}` via the body which would both
+pass type validation.
 
-#### integer
+You can combine as many types as you'd like:
 
+```javascript
+@param {string|buffer|array|integer}
+```
 
+Including `any` in your list will, as expected, override any other type specifications.
 
-#### boolean
+#### Enums and restricting to specific values
 
+Similar to combining types, you can also include specific JSON values in your type definitions:
 
+```javascript
+/**
+ * @param {"one"|"two"|"three"|4} myparam String or an integer
+ */
+export async function GET (myparam) {
+  // do something
+} 
+```
 
-#### array
+This allows you to restrict possible inputs to a list of allowed values. In the case above,
+sending `?myparam=4` via HTTP GET **will** successfully parse to  `4` (`Number`), because it
+will fail validation against the three string options.
 
+You can combine specific values and types in your definitions freely:
 
+```javascript
+@param {"one"|"two"|integer}
+```
 
-#### object
+Just note that certain combinations will invalidate other list items. Like `{1|2|integer}` will
+accept any valid integer.
 
+#### Sizes (lengths)
 
+The types `string`, `array` and `buffer` support sizes (lengths) via the `{a..b}` modifier on the type.
+For example;
 
-##### object.http
+```javascript
+@param {string{..9}}  alpha
+@param {string{2..6}} beta
+@param {string{5..}}  gamma
+```
 
+Would expect `alpha` to have a maximum length of `9`, `beta` to have a minimum length of
+`2` but a maximum length of `6`, and `gamma` to have a minimum length of `5`.
 
+#### Ranges
 
-#### buffer
+The types `number`, `float` and `integer` support ranges via the `{a,b}` modifier on the type.
+For example;
 
+```javascript
+@param {number{,1.2e9}} alpha
+@param {number{-10,10}} beta
+@param {number{0.870,}} gamma
+```
 
+Would expect `alpha` to have a maximum value of `1 200 000 000`, `beta` to have a minimum value of
+`-10` but a maximum value of `10`, and `gamma` to have a minimum value of `0.87`.
 
-#### other
+#### Arrays
 
+Arrays are supported via the `array` type. You can optionally specify a schema for the array
+which applies to **every element in the array**. There are two formats for specifying array
+schemas, you can pick which works best for you:
 
+```javascript
+@param {string[]}      arrayOfStrings1
+@param {array<string>} arrayOfStrings2
+```
 
-##### enum
+For multi-dimensional arrays, you can use nesting:
 
+```javascript
+@param {integer[][]}           array2d
+@param {array<array<integer>>} array2d_too
+```
 
+**Please note**: Combining types are not currently available in array schemas. Open up an
+issue and let us know if you'd like them and what your use case is! In the meantime;
+
+```javascript
+@param {integer[]|string[]}
+```
+
+Would successfully define an array of integers or an array of strings.
+
+#### Object schemas
+
+To define object schemas, use the following lines of the schema to define individual properties.
+For example, the object `{"a": 1, "b": "two", "c": {"d": true, "e": []}` Could be defined like so:
+
+```javascript
+@param {object}  myObject
+@param {integer} myObject.a
+@param {string}  myObject.b
+@param {object}  myObject.c
+@param {boolean} myObject.c.d
+@param {array}   myObject.c.e
+```
+
+To define object schemas that are members of arrays, you must identify the array component in the
+property name with `[]`. For example:
+
+```javascript
+@param {object[]} topLevelArray
+@param {integer}  topLevelArray[].value
+@param {object}   myObject
+@param {object[]} myObject.subArray
+@param {string}   myObject.subArray[].name
+```
 
 ### Parameter validation
 
