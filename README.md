@@ -204,11 +204,16 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
       1. [Arrays](#arrays)
       1. [Object schemas](#object-schemas)
    1. Parameter validation
+      1. Query and Body parsing with `application/x-www-form-urlencoded`
+      1. Query vs. Body parameters
+   1. CORS (Cross-Origin Resource Sharing)
    1. Returning responses
       1. `@returns` type safety
-      1. Custom HTTP Responses
-      1. Streaming Responses
-      1. Debug Responses
+      1. Error responses
+      1. Custom HTTP responses
+      1. Returning files with Buffer responses
+      1. Streaming responses
+      1. Debug responses
    1. Throwing errors
 1. OpenAPI Specification Generation
 1. Streaming and LLM Support
@@ -217,14 +222,6 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. Using the `_stream` parameter
 1. Debugging
    1. Using the `_debug` parameter
-1. Advanced Endpoint Management
-   1. Request handling
-      1. GET / DELETE
-      1. POST / PUT
-      1. `application/json`,
-      1. `application/x-www-form-urlencoded`
-      1. `multipart/form-data`
-   1. CORS (Cross-Origin Resource Sharing)
 1. Built-in Errors
 1. Testing
    1. via `instant test`
@@ -488,10 +485,10 @@ curl -X GET localhost:8000/
 curl -X GET localhost:8000/?name=world
 > "hello world you are 25"
 
-curl -X GET localhost:8000/?name=world&age=lol
+curl -X GET 'localhost:8000/?name=world&age=lol'
 > {"error":...} # Returns ParameterError (400) -- age should be a number
 
-curl -X GET localhost:8000/?name=world&age=99
+curl -X GET 'localhost:8000/?name=world&age=99'
 > "hello world you are 99"
 ```
 
@@ -554,7 +551,7 @@ curl -X GET localhost:8000/
 curl -X GET localhost:8000/?name=world
 > "hello world, you are 4200000000"
 
-curl -X GET localhost:8000/?name=world&age=101
+curl -X GET 'localhost:8000/?name=world&age=101'
 > "hello world, you are 101"
 ```
 
@@ -892,36 +889,260 @@ property name with `[]`. For example:
 
 ### Parameter validation
 
+Parameter validation occurs based on types as defined per [Type Safety](#type-safety).
+The process for parameter validation takes the following steps:
+
+1. Read parameters from the HTTP query string as type `application/x-www-form-urlencoded`
+1. If applicable, read parameters from the HTTP body based on the request `Content-Type`
+   - Supported content types:
+     - `application/json`
+     - `application/x-www-formurlencoded`
+     - `multipart/form-data`
+     - `application/xml`, `application/atom+xml`, `text/xml`
+1. Query parameters **can not** conflict with body parameters, throw an error if they do
+1. Perform type coercion on `application/x-www-form-urlencoded` inputs (query and body, if applicable)
+1. Validate parameters against their expected types, throw an error if they do not match
+
+During this process, you can encounter a `ParameterParseError` or a `ParameterError` both with
+status code `400`. `ParameterParseError` means your parameters could not be parsed based on
+the expected or provided content type, and `ParameterError` is a validation error against the
+schema for your endpoint.
+
+#### Query and Body parsing with `application/x-www-form-urlencoded`
+
+Many different standards have been implemented and adopted over the years for
+HTTP query parameters and how they can be used to specify objects and arrays.
+To make things easy, Instant API supports all common query parameter parsing formats.
+
+Here are some query parameter examples of parsing form-urlencoded data:
+
+- Arrays
+  - Duplicates: `?arr=1&arr=2` becomes `[1, 2]`
+  - Array syntax: `?arr[]=1&arr[]=2` becomes `[1, 2]`
+  - Index syntax: `?arr[0]=1&arr[2]=3` becomes `[1, null, 3]`
+  - JSON syntax: `?arr=[1,2]` becomes `[1, 2]`
+- Objects
+  - Bracket syntax: `?obj[a]=1&obj[b]=2` becomes `{"a": 1, "b": 2}`
+  - Dot syntax: `?obj.a=1&obj.b=2` becomes `{"a": 1, "b": 2}`
+    - Nesting: `?obj.a.b.c.d=t` becomes `{"a": {"b": {"c": {"d": true}}}}`
+  - JSON syntax: `?obj={"a":1,"b":2}` becomes `{"a": 1, "b": 2}`
 
 #### Query vs. Body parameters
 
+With Instant API, **query and body parameters can be used interchangeably**.
+The general expectation is that `POST` and `PUT` endpoints should typically
+only interface with the content body, but API consumers should be able to freely
+manipulate query parameters if they want to play around.
+For example, the endpoint defined by:
 
-####
+```javascript
+/**
+ * Hello world endpoint
+ * @param {string} name
+ * @param {number} age
+ */
+export async function POST (name, age) {
+  return `hello ${name}, you are ${age}!`;
+}
+```
 
+Could be triggered successfull via;
+
+```shell
+curl -X POST 'localhost:8000/hello-world?name=world&age=99'
+curl -X POST 'localhost:8000/hello-world?name=world' --data '{"age":99}'
+curl -X POST 'localhost:8000/hello-world' --data '{"name":"world","age":99}'
+```
+
+Generally speaking, our motivation for this pattern comes from two observations;
+
+1. In decades of software development we have never seen a legitimate use case for
+   query parameters and body parameters with the same name on a single endpoint
+2. Exposing APIs this way is a lot easier for end users to play with
+
+To prevent unexpected errors, naming collisions will throw an error at the gateway layer,
+before your endpoint is executed.
+
+### CORS (Cross-Origin Resource Sharing)
+
+By default, all endpoints have a **completely open** CORS policy, they all return
+the header `Access-Control-Allow-Origin: *`.
+
+To restrict endpoints to specific URLs use the `@origin` directive. You can add
+as many of these as you'd like.
+
+```javascript
+/**
+ * My CORS-restricted endpoint
+ * @origin staging.my-website.com
+ * @origin http://localhost:8000
+ * @origin https://my-website.com
+ * @origin =process.env.ALLOWED_ORIGIN
+ * @origin =process.env.ANOTHER_ALLOWED_ORIGIN
+ * @param {number} age
+ */
+export async function POST (name, age) {
+  return `hello ${name}, you are ${age}!`;
+}
+```
+
+The CORS `Access-Control-Allow-Origin` policy will be set like so;
+
+- If no protocol is specified, allow all traffic from the URL
+- If port is specified, only allow traffic from the URL on the specified port
+- If `http://` is specified, only allow `http` protocol traffic from the URL
+- If `https://` is specified, only allow `https` protocol traffic from the URL
+- If origin starts with `=process.env.`, it will rely on the specified environment variable
+
+Note that `=process.env.ENV_NAME` entries will be loaded at startup time. Dynamically
+changing `process.env` afterwards will have no effect on your allowed origins.
 
 ### Returning responses
 
+Returning API responses from your endpoint is easy. Just add a `return` statement
+with whatever data you would like to return.
 
+```javascript
+export async function GET () {
+  return `hello world`; // works as expected
+}
+```
+
+By default, all responses will be `JSON.stringify()`-ed and returned with the
+`Content-Type` header set to `application/json`.
+
+```shell
+curl localhost:8000/hello-world
+> "hello world"
+```
+
+There are two exceptions: returning an `object.http` object
+(containing `statusCode`, `headers`, and `body`) allows you to provide a
+[Custom HTTP response](#custom-http-responses) and returning a `Buffer`, which are
+treated as [raw binary (file) data](#returning-files-with-buffer-responses).
 
 #### `@returns` type safety
 
+Similar to [Parameter validation](#parameter-validation), you can enforce a type
+schema on the return value of your endpoint like so;
 
+```javascript
+/**
+ * @returns {object} message
+ * @returns {string} message.content
+ */
+export async function GET () {
+  return {message: `hello world`};
+}
+```
 
-#### Custom HTTP Responses
+The difference between `@returns` type safety as compared to `@param` validation
+is that this type safety mechanism is run **after** your code has been executed.
+If you fail a `@returns` type safety check, the user receives a `ValueError` with
+status code `502`: a server error. The function may have executed successfully
+but the value does not fulfill the promised API contract. This functionality exists
+to ensure users can trust the type contract of your API. To avoid production snafus,
+we recommend [writing tests](#writing-tests) to validate that your endpoints
+return the values you expect them to.
 
+#### Error responses
 
+Any uncaught promises or thrown errors will result in a `RuntimeError` with a status
+code of `420` (unknown) by default. To customize error codes, check out
+[Throwing Errors](#throwing-errors).
 
-#### Streaming Responses
+#### Custom HTTP responses
 
+To return a custom HTTP response, simply return an object with one or all of the following
+keys: `statusCode` (integer), `headers` (object) and `body` (Buffer). You can specify
+this in the `@returns` schema, however Instant API will automatically detect the type.
 
+```javascript
+/**
+ * I'm a teapot
+ */
+export async function GET () {
+  return {
+    statusCode: 418,
+    headers: {'Content-Type', 'text/plain'},
+    body: Buffer.from(`I'm a teapot!`)
+  };
+}
+```
 
-#### Debug Responses
+#### Returning files with Buffer responses
 
+If you would like to return a raw file from the file system, compose binary data into a
+downloadable file, or dynamically generate an image (e.g. with Dall-E or Stable Diffusion)
+you can build a custom HTTP response as per above - but Instant API makes it a little easier
+than that.
 
+If you return a `Buffer` object you can optionally specify a `contentType` to set the
+`Content-Type` http header like so:
 
-### Throwing errors
+```javascript
+import fs from 'fs';
 
+/**
+ * Return an image from the filesystem to be displayed
+ */
+export async function GET () {
+  const buffer = fs.readFileSync('./path/to/image.png');
+  buffer.contentType = 'image/png';
+  return buffer;
+}
+```
 
+#### Streaming responses
+
+Instant API has first-class support for streaming using the `text/event-stream`
+content type and the "magic" `_stream` parameter.
+You can read more in [Streaming and LLM support](#streaming-and-llm-support).
+
+#### Debug responses
+
+In `development` environments, e.g. when `process.env.NODE_ENV=development`, you
+can stream the results of any function using the "magic" `_debug` parameter.
+This allows you to monitor function execution in the browser for long-running jobs.
+You can read more in [Debugging](#debugging).
+
+### Throwing Errors
+
+Whenever a `throw` statement is executed or a Promise is uncaught within the context
+of an Instant API endpoint, the default behavior is to return a `RuntimeError` with
+a status code of `420`: your browser will refer to this as "unknown", we think of it
+as "confused".
+
+To specify a specific error code between 400 and 404, simply throw an error prefixed
+with the code and a colon like so:
+
+```javascript
+/**
+ * Errors out
+ */
+export async function GET () {
+  throw new Error(`400: No good!`);
+}
+```
+
+When you execute this function you would see a `BadRequestError` with a status code of `400`:
+
+```json
+{
+  "error": {
+    "type": "BadRequestError",
+    "message": "No good!"
+  }
+}
+```
+
+The following error codes will automatically map to error types:
+
+- 400: `BadRequestError`
+- 401: `UnauthorizedError`
+- 402: `PaymentRequiredError`
+- 403: `ForbiddenError`
+- 404: `NotFoundError`
 
 ## OpenAPI Specification Generation
 
@@ -948,39 +1169,6 @@ property name with `[]`. For example:
 
 
 ### Using the `_debug` parameter
-
-
-
-## Advanced Endpoint Management
-
-
-
-### Request handling
-
-
-
-#### GET / DELETE
-
-
-
-#### POST / PUT
-
-
-
-#### `application/json`,
-
-
-
-#### `application/x-www-form-urlencoded`
-
-
-
-#### `multipart/form-data`
-
-
-
-### CORS (Cross-Origin Resource Sharing)
-
 
 
 ## Built-in Errors

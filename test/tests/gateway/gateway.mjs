@@ -15,6 +15,8 @@ const FaaSGateway = new Gateway({
   defaultTimeout: 1000
 });
 
+process.env.ALLOWED_ORIGIN = 'instant.dev';
+
 export const name = 'Gateway';
 export default async function (setupResult) {
 
@@ -4620,6 +4622,17 @@ export default async function (setupResult) {
     expect(res.json.error).to.exist;
     expect(res.json.error.type).to.equal('OriginError');
     expect(res.json.error.message).to.contain(`"http://hello.com"`)
+
+  });
+
+  it('Endpoint triggered with request origin "http://instant.dev" should work', async () => {
+    
+    let res = await this.post('/origin/allow/', {alpha: 'hello'}, {'origin': 'http://instant.dev'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.headers['access-control-allow-origin']).to.equal('http://instant.dev');
+    expect(res.json).to.exist;
 
   });
 

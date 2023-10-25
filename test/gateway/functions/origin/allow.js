@@ -4,6 +4,7 @@
 * @origin localhost:8000
 * @origin test.some-url.com:9999
 * @origin https://hello.com
+* @origin =process.env.ALLOWED_ORIGIN
 * @background
 * @param {string} alpha Some value
 * @stream {boolean} hello Some value

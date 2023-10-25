@@ -24,6 +24,8 @@ const cases = fs.readdirSync(CASE_PATH).map(filename => {
 const FunctionParser = InstantAPI.FunctionParser;
 const parser = new FunctionParser();
 
+process.env.CASE_ORIGIN = 'hello.com';
+
 export const name = 'Function export validation';
 export default async function (setupResult) {
 
