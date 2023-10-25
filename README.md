@@ -181,6 +181,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [Quickstart](#quickstart)
    1. [Custom installation](#custom-installation)
 1. [Endpoints and Type Safety](#endpoints-and-type-safety)
+   1. [Creating Endpoints](#creating-endpoints)
    1. [Responding to HTTP methods](#responding-to-http-methods)
       1. [Endpoint lifecycle](#endpoint-lifecycle)
       1. [Typing your endpoint](#typing-your-endpoint)
@@ -343,11 +344,11 @@ npm start
 
 ## Endpoints and Type Safety
 
-Creating endpoints for Instant API is easy. Instant API relies on a Function as a Service
-model for endpoint execution: every {Route, HTTP Method} combination is modeled as an
-exported function. To add parameter validation a.k.a. type safety to your endpoints,
-you simply document your exported functions with a slightly modified JSDoc specification
-comment block. For example, the simplest endpoint possible would look like this;
+Instant API relies on a Function as a Service model for endpoint execution: every
+{Route, HTTP Method} combination is modeled as an exported function. To add parameter
+validation a.k.a. type safety to your endpoints, you simply document your exported
+functions with a slightly modified JSDoc specification comment block. For example,
+the simplest endpoint possible would look like this;
 
 File: `functions/index.js`
 
@@ -366,6 +367,23 @@ curl localhost:8000/
 
 Assuming you are running `instant serve` or `npm start` on port `8000`. See
 [Getting started](#getting-started) for more details on starting your server.
+
+### Creating endpoints
+
+The easiest way to create endpoints for Instant API is via the `instant.dev`
+[command line tools](https://github.com/instant-dev/instant). Once your project
+has been initialized, you can write:
+
+```shell
+instant g:endpoint path/to/endpoint
+```
+
+And voila! A new blank endpoint has been created at `/functions/path/to/endpoint/index.mjs`.
+
+If you want to create an endpoint manually, just create a new `.mjs` file in the `functions/`
+directory and make sure it outputs a function corresponding to at least one HTTP method:
+`GET`, `POST`, `PUT` or `DELETE`.
+
 
 ### Responding to HTTP methods
 
