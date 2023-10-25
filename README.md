@@ -3,8 +3,8 @@
 ![travis-ci build](https://travis-ci.org/instant-dev/api.svg?branch=main)
 ![npm version](https://img.shields.io/npm/v/@instant.dev/api?label=)
 
-# Build type-safe JavaScript APIs, instantly
-## with spec generation and LLM streaming
+# Build type-safe web APIs with JavaScript, instantly
+## includes spec generation and LLM streaming
 
 Instant API is a framework for building APIs with JavaScript that implements
 **type-safety at the HTTP interface**. By doing so, it eliminates the need for
