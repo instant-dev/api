@@ -163,19 +163,23 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
 
 ## Table of Contents
 
-1. Getting Started
-   1. Quickstart
-   1. Custom installation
-1. Endpoints and Type Safety
-   1. Endpoint structure
-      1. Creating an endpoint
-      1. `context` object
-      1. API endpoints: `functions/` directory
-         1. Index routing with `index.js`
-         1. Wildcard routing with `404.js`
-      1. Static files: `www/` directory
-         1. Index routing with `index.html`
-         1. Wildcard routing with `404.html`
+1. [Getting Started](#getting-started)
+   1. [Quickstart](#quickstart)
+   1. [Custom installation](#custom-installation)
+1. [Endpoints and Type Safety](#endpoints-and-type-safety)
+   1. [Responding to HTTP methods](#responding-to-http-methods)
+      1. [Endpoint lifecycle](#endpoint-lifecycle)
+      1. [Typing your endpoint](#typing-your-endpoint)
+          1. [Undocument parameters](#undocumented-parameters)
+          1. [Required parameters](#required-parameters)
+          1. [Optional parameters](#optional-parameters)
+      1. [`context` object](#context-object)
+      1. [API endpoints: `functions/` directory](#api-endpoints-functions-directory)
+         1. [Index routing with `index.mjs`](#index-routing-with-indexmjs)
+         1. [Subdirectory routing with `404.mjs`](#subdirectory-routing-with-404mjs)
+      1. [Static files: `www/` directory](#static-files-www-directory)
+         1. [Index routing with `index.html`](#index-routing-with-indexhtml)
+         1. [Subdirectory routing with `404.html`](#subdirectory-routing-with-404html)
    1. Supported types
       1. any
       1. boolean
@@ -224,6 +228,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. Logging
    1. Error monitoring
    1. Middleware
+1. Acknowledgements
 
 ## Getting Started
 
@@ -328,6 +333,535 @@ npm start
 ```
 
 ## Endpoints and Type Safety
+
+Creating endpoints for Instant API is easy. Instant API relies on a Function as a Service
+model for endpoint execution: every {Route, HTTP Method} combination is modeled as an
+exported function. To add parameter validation a.k.a. type safety to your endpoints,
+you simply document your exported functions with a slightly modified JSDoc specification
+comment block. For example, the simplest endpoint possible would look like this;
+
+File: `functions/index.js`
+
+```javascript
+export default async function () {
+  return `hello world`;
+}
+```
+
+And you could execute it with;
+
+```shell
+curl localhost:8000/
+> "hello world"
+```
+
+Assuming you are running `instant serve` or `npm start` on port `8000`. See
+[Getting started](#getting-started) for more details on starting your server.
+
+### Responding to HTTP methods
+
+In the example above, we used `export default` to export a default function.
+This function will respond to to all `GET`, `POST`, `PUT` and `DELETE` requests
+with the same function. Alternatively, we can export methods for each method individually,
+like so:
+
+File: `functions/index.js`
+
+```javascript
+export async function GET () {
+  return `this was a GET request!`;
+}
+
+export async function POST () {
+  return `this was a POST request!`;
+}
+```
+
+Any method not specified in this manner will automatically return an HTTP 501 error
+(Not Implemented). You can test these endpoints like so;
+
+```shell
+curl -X GET localhost:8000/
+> "this was a GET request!"
+curl -X POST localhost:8000/
+> "this was a POST request!"
+curl -X PUT localhost:8000/
+> {"error":...} # Returns NotImplementedError (501)
+```
+
+Note that the function names are **case sensitive**, they **must** be uppercase.
+Instant API will throw an error if the exports aren't read properly.
+
+#### Endpoint lifecycle
+
+When endpoint files, like `functions/index.js` above, are accessed they
+are imported **only once** per process. Any code outside of the `export` statements
+is executed lazily the first time the function is executed per process. By default,
+in a production server environment, Instant API will start one process per virtual core.
+
+Each exported function will be executed every time it is called. For the most part,
+you should only use the area outside of the `export` statement for critical library
+imports and frequently accessed object caching; **not for data persistence**.
+
+Here's an example using [Instant ORM](https://github.com/instant-dev/orm):
+
+```javascript
+// DO THIS: Cache connections and commonly used objects, constructors
+
+// Executed only once per process: lazily on first execution
+import InstantAPI from '@instant.dev/api';
+const Instant = await InstantAPI.connectToPool(); // connect to postgres
+const User = Instant.Model('User'); // access User model
+
+/**
+ * Find all users matching a provided username
+ * @param {string} searchQuery Username portion to search for
+ * @returns {object[]} users
+ */
+export async function GET (searchQuery) {
+  // Executed each time endpoint called
+  return await User.query()
+    .where({username__icontains: searchUsername})
+    .select();
+}
+```
+
+Here's an example of what you should **not** do:
+
+```javascript
+// DO NOT DO THIS: data persistence not reliable in production workloads
+//    Could be on a multi-core server or serverless deployment e.g. Vercel
+
+let pageViews = 0;
+
+/**
+ * Track views -- poorly. Persistence unreliable!
+ */
+export async function GET () {
+  return `This page has been viewed ${++pageViews} times`;
+}
+```
+
+#### Typing your endpoint
+
+Endpoints can be typed using a slightly modified JSDoc specification that is
+easily interpreted and syntax highlighted by most modern code editors. You
+type your endpoint by (1) providing a comment block immediately preceding
+your exported function and / or (2) providing default values for your
+exported function.
+
+**Note:** Parameter documentation for typing is an all-or-none affair.
+Instant API will refuse to start up if documented endpoints do not match the
+function signature.
+
+##### Undocumented parameters
+
+By default, if you do not document your parameters **at all**, they will
+be assumed to be type `any` and all be required. If you provided default
+values, the parameters will be optional but will assume the type of their
+default value.
+
+```javascript
+export async function GET (name, age = 25) {
+  return `hello ${name} you are ${age}`;
+}
+```
+
+In this case, `name` is **required** by can take on any type. `age` is **optional**
+but must be a `number`.
+
+```shell
+curl -X GET localhost:8000/
+> {"error":...} # Returns ParameterError (400) -- name is required
+curl -X GET localhost:8000/?name=world
+> "hello world you are 25"
+curl -X GET localhost:8000/?name=world&age=lol
+> {"error":...} # Returns ParameterError (400) -- age should be a number
+curl -X GET localhost:8000/?name=world&age=99
+> "hello world you are 99"
+```
+
+##### Required parameters
+
+A parameter is **required** if you **do not provide a default value** in the function
+signature. For example;
+
+```javascript
+/**
+ * @param {string} name 
+ */
+export async function GET (name) {
+  return `hello ${name}`;
+}
+```
+
+Will return a `ParameterError` with status code `400` indicating the `name`
+parameter is required if no `name` is passed in to the endpoint.
+
+```shell
+curl -X GET localhost:8000/
+> {"error":...} # Returns ParameterError (400)
+curl -X GET localhost:8000/?name=world
+> "hello world"
+```
+
+##### Optional parameters
+
+A parameter is **optional** if you:
+
+- prefix the type with a `?`
+- AND / OR provide a default value in the function signature
+
+If you prefix the type with `?`, the default value is assumed to be `null`.
+You **can not** use `undefined` as an acceptable endpoint parameter value.
+
+For example;
+
+```javascript
+/**
+ * @param {?string} name 
+ * @param {number} age
+ */
+export async function GET (name, age = 4.2e9) {
+  return `hello ${name}, you are ${age}`;
+}
+```
+
+Even though `name` was not provided in the function signature, the `?` in
+`{?string}` indicates that this parameter is optional. It will be given a
+default value of `null`. When included in a template string, null will be
+printed as the string `"null"`.
+
+```shell
+curl -X GET localhost:8000/
+> "hello null, you are 4200000000"
+curl -X GET localhost:8000/?name=world
+> "hello world, you are 4200000000"
+curl -X GET localhost:8000/?name=world&age=101
+> "hello world, you are 101"
+```
+
+#### `context` object
+
+The `context` object is a "magic" parameter that can be appended to any
+function signature. It **can not** be documented and you **can not**
+use "context" as a parameter name. The other magic parameters are
+`_stream` ([Streaming and LLM support](#streaming-and-llm-support)),
+`_debug` ([Debug](#debugging)) and `_background`. However, only
+`context` can be added to your function signature.
+
+You can use `context` to access execution-specific information like so;
+
+```javascript
+export async function GET (context) {
+  console.log(context.http.method);   // "GET"
+  console.log(context.http.body);     // Raw body (Buffer)
+  console.log(context.remoteAddress); // IP address
+  return context;                     // ... and much more
+}
+```
+
+It also comes with a `context.stream()` function which you can read about
+in [Streaming and LLM support](#streaming-and-llm-support).
+
+A full list of available properties is as follows;
+
+```javascript
+{
+  "name": "{endpoint_name}",
+  "alias": "{request_pathname}",
+  "path": ["request_pathname", "split", "by", "/"],
+  "params": {"jsonified": "params", "passed": "via_query_and_body"},
+  "remoteAddress": "{ipv4_or_v6_address}",
+  "uuid": "{request_uuid}",
+  "http": {
+    "url": "{request_url}",
+    "method": "{request_method}",
+    "headers": {"request": "headers"},
+    "body": "{request_body_utf8}",
+    "json": "{request_body_json_if_applicable}",
+  },
+  "stream": function stream (name, value) { /* ... */ }
+}
+```
+
+#### API endpoints: `functions/` directory
+
+By default, anything in the root `functions/` directory of an Instant API
+project is exported as an API endpoint. All `.js`, `.cjs` and `.mjs` files
+are valid. We have not covered CommonJS-styled exports here as they are supported
+for legacy purposes and not recommended for forward-facing development.
+
+Routing is handled by mapping the pathname of an HTTP request to the internal file
+pathname of the function, not including `functions/` or the file extension. For example,
+an HTTP request to `/v1/hello-world` will trigger `functions/v1/hello-world.js`.
+
+There are four "magic" filenames that can be used to handle indices or subdirectories.
+`index.mjs` / `__main__.mjs` will act as a handler for the root directory and
+`404.mjs` / `__notfound__.mjs` will act as a handler for any subdirectory or file
+that is not otherwise defined.
+
+##### Index routing with `index.mjs`
+
+Alias: `__main__.mjs`
+
+Handler for the root directory. For example, 
+`functions/v1/stuff/index.mjs` is accessible via `/v1/stuff`.
+
+##### Subdirectory routing with `404.mjs`
+
+Alias: `__notfound__.mjs`
+
+Handler for subdirectories not otherwise defined. For example, with the following
+directory structure:
+
+```yaml
+- functions/
+  - v1/
+    - stuff/
+      - 404.mjs
+      - abc.mjs
+```
+
+The following HTTP request pathnames would map to these endpoints;
+
+- `/v1/stuff` -> `functions/v1/stuff/404.mjs`
+- `/v1/stuff/abc` -> `functions/v1/stuff/abc.mjs`
+- `/v1/stuff/abcd` -> `functions/v1/stuff/404.mjs`
+- `/v1/stuff/abc/def` -> `functions/v1/stuff/404.mjs`
+
+You can use this behavior to define custom routing schemes. If you want
+custom 404 error pages we recommend using [Subdirectory routing with `404.html`](#subdirectory-routing-with-404html) instead.
+
+#### Static files: `www/` directory
+
+Instant API comes with built-in static file hosting support. Instead
+of putting files in the `functions/` directory, put any file you want
+in the `www/` directory to automatically have it hosted as a standalone static
+file.
+
+The rules for static hosting are as follows;
+
+- The server root `/` maps directly to `www/`
+- e.g. `/image.png` -> `www/image.png`
+- All `.htm` and `.html` files will be available with AND without suffixes
+- `/hello` -> `www/hello.html`
+- `/hello.html` -> `www/hello.html`
+- API and static routes **can not** conflict
+- `functions/wat.mjs` would overlap with `www/wat.htm` and is **not** allowed
+
+There are four "magic" filenames that can be used to handle indices or subdirectories.
+`index.html` / `index.htm` will act as a handler for the root directory and
+`404.html` / `404.htm` will act as a handler for any subdirectory or file
+that is not otherwise defined.
+
+##### Index routing with `index.html`
+
+Alias: `index.htm`
+
+Same behavior as `index.js` for API routes. Handler for the root pathname.
+
+##### Subdirectory routing with `404.html`
+
+Alias: `404.htm`
+
+Same behavior as `404.js` for API routes. Handler for subdirectories that are
+not otherwise defined. Ideal use case is for custom 404 error pages.
+
+### Supported types
+
+[ DOCUMENTATION IN PROGRESS ]
+
+#### any
+
+
+
+#### boolean
+
+
+
+#### string
+
+
+
+#### number
+
+
+
+#### float
+
+
+
+#### integer
+
+
+
+#### boolean
+
+
+
+#### array
+
+
+
+#### object
+
+
+
+##### object.http
+
+
+
+#### buffer
+
+
+
+#### other
+
+
+
+##### enum
+
+
+
+### Parameter validation
+
+
+#### Query vs. Body parameters
+
+
+####
+
+
+### Returning responses
+
+
+
+#### `@returns` type safety
+
+
+
+#### Custom HTTP Responses
+
+
+
+#### Streaming Responses
+
+
+
+#### Debug Responses
+
+
+
+### Throwing errors
+
+
+
+## OpenAPI Specification Generation
+
+
+
+## Streaming and LLM Support
+
+
+
+### `@stream` type safety
+
+
+
+### Using `context.stream()`
+
+
+
+### Using the `_stream` parameter
+
+
+
+## Debugging
+
+
+
+### Using the `_debug` parameter
+
+
+
+## Advanced Endpoint Management
+
+
+
+### Request handling
+
+
+
+#### GET / DELETE
+
+
+
+#### POST / PUT
+
+
+
+#### `application/json`,
+
+
+
+#### `application/x-www-form-urlencoded`
+
+
+
+#### `multipart/form-data`
+
+
+
+### CORS (Cross-Origin Resource Sharing)
+
+
+
+## Built-in Errors
+
+
+
+## Testing
+
+
+
+### via `instant test`
+
+
+
+### Writing tests
+
+
+
+### Running tests
+
+
+
+## Deployment
+
+
+
+### via `instant deploy`
+
+
+
+### Custom deployments
+
+
+
+## More Information
+
+
+
+### Logging
+
+
+
+### Error monitoring
+
+
+
+### Middleware
 
 # Acknowledgements
 
