@@ -8,17 +8,18 @@
 
 Instant API is a framework for building APIs with JavaScript that implements
 **type-safety at the HTTP interface**. By doing so, it eliminates the need for
-schema validation libraries entirely. Simply write a JSDoc-compliant comment block
-for a function that represents your API endpoint and stop worrying about validation
-and testing for user input. The OpenAPI specification for your API is then automatically
-generated in both JSON and YAML at `localhost:8000/.well-know/openapi.json` and
-`localhost:8000/.well-known/openapi.yaml`.
+schema validation libraries entirely. Simply write a JSDoc-compliant comment
+block for a function that represents your API endpoint and stop worrying about
+validation, sanitization and testing for user input. The OpenAPI specification
+for your API is then automatically generated in both JSON and YAML at
+`localhost:8000/.well-known/openapi.json` and
+`localhost:8000/.well-known/openapi.yaml`, respectively.
 
 Additionally, Instant API comes packaged with LLM-focused features to future-proof your
 API in preparation for AI integration. First class support for `text/event-stream` makes
 streaming LLM responses easy,
-[LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) is
-a breeze via a JSON Schema list of your API functions available at at
+[LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) can
+be set up via a JSON Schema list of your API functions available at at
 `localhost:8000/.well-known/schema.json`, and experimental auto-generation of
 `localhost:8000/.well-known/ai-plugin.json` enables rapid integration into AI platforms
 like OpenAI plugins.
