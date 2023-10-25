@@ -37,7 +37,11 @@ Instant API comes with the following features;
 ## Quick example: Standard API
 
 Here's an example API endpoint built with Instant API. It would be available
-at the URL `example.com/v1/weather/current` via HTTP GET.
+at the URL `example.com/v1/weather/current` via HTTP GET. It has length
+restrictions on `location`, range restrictions on `coords.lat` and `coords.lng`,
+and `tags` is an array of string. The `@returns` definitions ensure that the API
+contract with the user is upheld: if the wrong data is returned an error will be
+thrown.
 
 File: `/functions/v1/weather/current.mjs`
 
@@ -56,11 +60,11 @@ File: `/functions/v1/weather/current.mjs`
 export async function GET (location = null, coords = null, tags = []) {
 
   if (!location && !coords) {
-    // Prefixing an error message with a "{code}:" between 400 and 404
-    //   automatically creates the correct associated Client Error:
-    //   BadRequestError, UnauthorizedError, PaymentRequiredError,
-    //   ForbiddenError, NotFoundError
-    // Otherwise, will return a RuntimeError with code 400
+    // Prefixing an error message with a "###:" between 400 and 404
+    //   automatically creates the correct client error:
+    //     BadRequestError, UnauthorizedError, PaymentRequiredError,
+    //     ForbiddenError, NotFoundError
+    // Otherwise, will throw a RuntimeError with code 420
     throw new Error(`400: Must provide either location or coords`);
   } else if (location && coords) {
     throw new Error(`400: Can not provide both location and coords`);
@@ -80,22 +84,78 @@ export async function GET (location = null, coords = null, tags = []) {
 
 ## Quick example: LLM Streaming
 
-LLM streaming is simple. It relies on a special `context` object
-and defining `@stream` parameters to create a `text/event-stream` response.
+LLM streaming is simple. It relies on a special `context` object and defining
+`@stream` parameters to create a `text/event-stream` response. You can think
+of `@stream` as similar to `@returns`, where you're specifying the schema
+for the output to the user. If this contract is broken, your API will throw an
+error.
 
 File: `/functions/v1/ai-helper.mjs`
 
 ```javascript
+import OpenAI from 'openai';
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
+
 /**
- * AI Helper: Ask me anything!
- * @param {string} query Question to ask the helper
- * @returns {object}
+ * Streams results for our lovable assistant
+ * @param {string} query The question for our assistant
+ * @stream {object}   chunk
+ * @stream {string}   chunk.id
+ * @stream {string}   chunk.object
+ * @stream {integer}  chunk.created
+ * @stream {string}   chunk.model
+ * @stream {object[]} chunk.choices
+ * @stream {integer}  chunk.choices[].index
+ * @stream {object}   chunk.choices[].delta
+ * @stream {?string}  chunk.choices[].delta.role
+ * @stream {?string}  chunk.choices[].delta.content
+ * @returns {object} message
+ * @returns {string} message.content
  */
-export async function GET (query) {
+export async function GET (query, context) {
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {role: `system`, content: `You are a lovable, cute assistant that uses too many emojis.`},
+      {role: `user`, content: query}
+    ],
+    model: `gpt-3.5-turbo`,
+    stream: true
+  });
+  const messages = [];
+  for await (const chunk of completion) {
+    context.stream('chunk', chunk); // chunk has the schema provided above
+    messages.push(chunk?.choices?.[0]?.delta?.content || '');
+  }
+  return {content: messages.join('')};
+};
+```
 
-  // TODO: Write docs
-
+By default, this method will return something like;
+```json
+{
+  "content": "Hey there! 💁‍♀️ I'm doing great, thank you! 💖✨ How about you? 😊🌈"
 }
+```
+
+However, if you append `&_stream` to query parameters or `{"_stream": true}` to
+body parameters, it will turn into a `text/event-stream` with your `context.stream()`
+events sandwiched between a `@begin` and `@response` event. The `@response` event
+will be an object containing the details of what the HTTP response would have contained
+had the API call been made normally.
+
+```shell
+id: 2023-10-25T04:07:51.835000000Z/ae84ad54-e30c-4366-8ce8-b6c092362565
+event: @begin
+data: "2023-10-25T04:07:51.835Z"
+
+[... more events ...]
+
+id: 2023-10-25T04:07:52.827000000Z/ae84ad54-e30c-4366-8ce8-b6c092362565
+event: chunk
+data: {"id":"chatcmpl-8DPTMfKP7DkdV14YJceoeFB1Hpllx","object":"chat.completion.chunk","created":1698206872,"model":"gpt-3.5-turbo-0613","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+event: @response
+data: {"statusCode":200,"headers":{"X-Execution-Uuid":"ae84ad54-e30c-4366-8ce8-b6c092362565","X-Debug":true,"X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-debug, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling super duper fantastic! 💃 How about you? 😊\"}"}
 ```
 
 ## Table of Contents

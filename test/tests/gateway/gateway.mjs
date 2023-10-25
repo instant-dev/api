@@ -1399,7 +1399,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1414,7 +1414,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/details/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1497,7 +1497,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/thrown/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1527,7 +1527,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/promise_uncaught/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1542,7 +1542,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/promise_unhandled_rejection/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1557,7 +1557,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/array/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1571,7 +1571,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/boolean/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1585,7 +1585,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/number/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1599,7 +1599,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/object/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
@@ -1613,7 +1613,7 @@ export default async function (setupResult) {
 
     let res = await this.post('/runtime/string/', {});
 
-    expect(res.statusCode).to.equal(400);
+    expect(res.statusCode).to.equal(420);
     expect(res.headers['x-execution-uuid'].length).to.be.greaterThan(1);
     expect(res.json).to.exist;
     expect(res.json).to.be.an('object');
