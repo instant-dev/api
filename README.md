@@ -17,7 +17,7 @@ Additionally, Instant API comes packaged with LLM-focused features to future-pro
 API in preparation for AI integration. First class support for `text/event-stream` makes
 streaming LLM responses easy,
 [LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) is
-a breeze via a list of your API functions available at at `/.well-known/functions.json`,
+a breeze via a list of your API functions available at at `/.well-known/schema.json`,
 and experimental auto-generation of `/.well-known/ai-plugin.json` enables rapid integration
 into AI platforms like OpenAI plugins.
 
@@ -203,19 +203,22 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
       1. [Ranges](#ranges)
       1. [Arrays](#arrays)
       1. [Object schemas](#object-schemas)
-   1. Parameter validation
-      1. Query and Body parsing with `application/x-www-form-urlencoded`
-      1. Query vs. Body parameters
-   1. CORS (Cross-Origin Resource Sharing)
-   1. Returning responses
-      1. `@returns` type safety
-      1. Error responses
-      1. Custom HTTP responses
-      1. Returning files with Buffer responses
-      1. Streaming responses
-      1. Debug responses
-   1. Throwing errors
-1. OpenAPI Specification Generation
+   1. [Parameter validation](#parameter-validation)
+      1. [Query and Body parsing with `application/x-www-form-urlencoded`](#query-and-body-parsing-with-applicationx-www-form-urlencoded)
+      1. [Query vs. Body parameters](#query-vs-body-parameters)
+   1. [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
+   1. [Returning responses](#returning-responses)
+      1. [`@returns` type safety](#returns-type-safety)
+      1. [Error responses](#error-responses)
+      1. [Custom HTTP responses](#custom-http-responses)
+      1. [Returning files with Buffer responses](#returning-files-with-buffer-responses)
+      1. [Streaming responses](#streaming-responses)
+      1. [Debug responses](#debug-responses)
+   1. [Throwing errors](#throwing-errors)
+1. [OpenAPI Specification Generation](#openapi-specification-generation)
+   1. [OpenAPI Output Example](#openapi-output-example)
+   1. [JSON Schema Output Example](#json-schema-output-example)
+   1. [Hiding endpoints with `@private`](#hiding-endpoints-with-private)
 1. Streaming and LLM Support
    1. `@stream` type safety
    1. Using `context.stream()`
@@ -1146,7 +1149,198 @@ The following error codes will automatically map to error types:
 
 ## OpenAPI Specification Generation
 
+OpenAPI specifications are extremely helpful for machine-readability but are
+extremely verbose. Instant API allows you to manage all your type signatures
+and parameter validation via JSDoc in a very terse manner while automatically
+generating your OpenAPI specification for you. By default Instant API will
+create three schema files based on your API:
 
+- `localhost:8000/.well-known/openapi.json`
+- `localhost:8000/.well-known/openapi.yaml`
+- `localhost:8000/.well-known/schema.json`
+
+The first two are [OpenAPI schemas](https://www.openapis.org/) and the
+final one is a [JSON schema](https://json-schema.org/) which outputs a
+`{"functions": [...]}` object. The latter is primarily intended for use
+with [OpenAI function calling](https://openai.com/blog/function-calling-and-other-api-updates)
+and other LLM integrations.
+
+### OpenAPI Output Example
+
+As a simple example, consider the following endpoint:
+
+```javascript
+/**
+ * Gets a "Hello World" message
+ * @param {string} name
+ * @param {number{12,199}} age
+ * @returns {string} message
+ */
+export async function GET (name, age) {
+  return `hello ${name}, you are ${age} and you rock!`
+}
+
+/**
+ * Creates a new hello world message
+ * @param {object} body
+ * @param {string} body.content
+ * @returns {object}  result
+ * @returns {boolean} result.created
+ */
+export async function POST (body) {
+  console.log(`Create body ... `, body);
+  return {created: true};
+}
+```
+
+Once saved as part of your project, if you open `localhost:8000/.well-known/openapi.yaml`
+in your browser, you should receive the following OpenAPI specification:
+
+```yaml
+openapi: "3.1.0"
+info:
+  version: "development"
+  title: "(No name provided)"
+  description: "(No description provided)"
+servers:
+  - url: "localhost"
+    description: "Instant API Gateway"
+paths:
+  /hello-world/:
+    get:
+      summary: "Gets a \"Hello World\" message"
+      description: "Gets a \"Hello World\" message"
+      operationId: "service_localhost_hello_world_get"
+      parameters:
+        - in: "query"
+          name: "name"
+          schema:
+            type: "string"
+        - in: "query"
+          name: "age"
+          schema:
+            type: "number"
+            minimum: 12
+            maximum: 199
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "string"
+    post:
+      summary: "Creates a new hello world message"
+      description: "Creates a new hello world message"
+      operationId: "service_localhost_hello_world_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                body:
+                  type: "object"
+                  properties:
+                    content:
+                      type: "string"
+                  required:
+                    - "content"
+              required:
+                - "body"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  created:
+                    type: "boolean"
+                required:
+                  - "created"
+```
+
+### JSON Schema Output Example
+
+Using the same endpoint defined above would produce the following JSON schema
+at `localhost:8000/.well-known/schema.json`:
+
+```json
+{
+  "functions": [
+    {
+      "name": "hello-world_get",
+      "description": "Gets a \"Hello World\" message",
+      "route": "/hello-world/",
+      "url": "localhost/hello-world/",
+      "method": "GET",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "age": {
+            "type": "number",
+            "minimum": 12,
+            "maximum": 199
+          }
+        },
+        "required": [
+          "name",
+          "age"
+        ]
+      }
+    },
+    {
+      "name": "hello-world",
+      "description": "Creates a new hello world message",
+      "route": "/hello-world/",
+      "url": "localhost/hello-world/",
+      "method": "POST",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "content"
+            ]
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    }
+  ]
+}
+```
+
+### Hiding endpoints with `@private`
+
+Don't want all of your endpoints exposed to your end users? No problem.
+Simply mark an endpoint as `@private`, like so:
+
+```javascript
+/**
+ * My admin function
+ * @private
+ */
+export async function POST (context) {
+  await authenticateAdminUser(context);
+  doSomethingAdministrative();
+  return `ok!`;
+}
+```
+
+This will prevent it from being shown in either your OpenAPI or JSON schema
+outputs.
 
 ## Streaming and LLM Support
 

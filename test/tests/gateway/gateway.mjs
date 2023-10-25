@@ -4753,7 +4753,7 @@ export default async function (setupResult) {
     expect(res.json).to.exist;
     expect(res.json.openapi).to.equal('3.1.0');
     expect(res.json.info).to.exist;
-    expect(res.json.info.version).to.equal('local');
+    expect(res.json.info.version).to.equal('development');
     expect(res.json.info.title).to.equal('(No name provided)');
     expect(res.json.info.description).to.equal('(No description provided)');
     expect(res.json.servers).to.be.an('Array');
