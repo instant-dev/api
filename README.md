@@ -441,8 +441,8 @@ Here's an example using [Instant ORM](https://github.com/instant-dev/orm):
 // DO THIS: Cache connections and commonly used objects, constructors
 
 // Executed only once per process: lazily on first execution
-import InstantAPI from '@instant.dev/api';
-const Instant = await InstantAPI.connectToPool(); // connect to postgres
+import InstantORM from '@instant.dev/orm';
+const Instant = await InstantORM.connectToPool(); // connect to postgres
 const User = Instant.Model('User'); // access User model
 
 /**
