@@ -3909,7 +3909,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/?alpha=hello&_stream', '');
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -3929,7 +3929,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/?alpha=hello&_stream=lol', '');
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -3949,7 +3949,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/', {alpha: 'hello', _stream: {'hello': true}});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -3969,7 +3969,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/', {alpha: 'hello', _stream: {'*': true}});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -3989,7 +3989,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/', {alpha: 'hello', _stream: {'hello': true, '*': true}});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4009,7 +4009,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4029,7 +4029,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic_buffer/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4053,7 +4053,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic_buffer_mocked/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4077,7 +4077,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic_buffer_nested/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4102,7 +4102,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic_buffer_nested_mocked/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4127,7 +4127,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/invalid_stream_name/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4162,7 +4162,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/invalid_stream_param/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4192,7 +4192,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/sleep/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4229,7 +4229,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/debug/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.body).to.exist;
 
     let events = res.events;
@@ -4262,7 +4262,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/debug/', {alpha: 'hello', _debug: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['x-debug']).to.equal('true');
     expect(res.body).to.exist;
 
@@ -4305,7 +4305,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/debug/', {alpha: 'hello', _debug: {'*': true, '@begin': true, '@stdout': true, '@stderr': true, '@error': true}});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['x-debug']).to.equal('true');
     expect(res.body).to.exist;
 
@@ -4348,7 +4348,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/basic/', {alpha: 'hello', _stream: {}, _debug: {hello: true}});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['x-debug']).to.equal('true');
     expect(res.body).to.exist;
 
@@ -4404,7 +4404,7 @@ export default async function (setupResult) {
     let res = await this.post('/stream/debug_no_stream/', {alpha: 'hello', _debug: true});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['x-debug']).to.equal('true');
     expect(res.body).to.exist;
 
@@ -4681,7 +4681,7 @@ export default async function (setupResult) {
     let res = await this.post('/origin/allow/', {alpha: 'hello', _stream: true}, {'origin': 'https://hello.com'});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['access-control-allow-origin']).to.equal('https://hello.com');
     expect(res.body).to.exist;
 
@@ -4692,7 +4692,7 @@ export default async function (setupResult) {
     let res = await this.post('/origin/allow/', {alpha: 'hello', _debug: true}, {'origin': 'https://hello.com'});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.headers['content-type']).to.equal('text/event-stream');
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
     expect(res.headers['access-control-allow-origin']).to.equal('https://hello.com');
     expect(res.body).to.exist;
 
