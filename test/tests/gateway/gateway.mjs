@@ -991,7 +991,7 @@ export default async function (setupResult) {
     expect(res.statusCode).to.equal(202);
     expect(res.body).to.be.instanceof(Buffer);
     expect(res.body.length).to.be.greaterThan(0);
-    expect(res.body.toString()).to.equal(`initiated "bg"...`);
+    expect(res.body.toString()).to.equal(`initiated "bg" ...`);
 
   });
 

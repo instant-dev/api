@@ -15,18 +15,19 @@ for your API is then automatically generated in both JSON and YAML at
 `localhost:8000/.well-known/openapi.json` and
 `localhost:8000/.well-known/openapi.yaml`, respectively.
 
-Additionally, Instant API comes packaged with LLM-focused features to future-proof your
-API in preparation for AI integration:
+Additionally, Instant API comes a number of features optimized for integrations
+with LLMs and chat bots:
 
 - First class support for Server-Sent Events using `text/event-stream` makes streaming LLM responses easy
 - [LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) can be integrated
 easily via JSON schema output at `localhost:8000/.well-known/schema.json`
 - Experimental auto-generation of `localhost:8000/.well-known/ai-plugin.json`
+- The ability to instantly return `200 OK` responses and execute in the background for Slack, Discord webhooks
 
 You will find Instant API is a very full-featured framework despite being an
 early release. It has been in development for six years as the engine behind the
 [Autocode](https://autocode.com) serverless platform where it has horizontally scaled
-to handle over 100M API requests per day. Happy hacking!
+to handle over 100M API requests per day.
 
 ## Quick example: Standard API
 
@@ -206,6 +207,10 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [`@stream` type safety](#stream-type-safety)
    1. [Using `context.stream()`](#using-contextstream)
    1. [Using the `_stream` parameter](#using-the-_stream-parameter)
+1. [Background execution for webhooks and chatbots](#background-execution-for-webhooks-and-chatbots)
+   1. [`@background` directive](#background-directive)
+   1. [Using the `_background` parameter](#using-the-_background-parameter)
+   1. [Background modes](#background-modes)
 1. [Debugging](#debugging)
    1. [Using `context.log()` and `context.error()`](#using-contextlog-and-contexterror)
    1. [Using the `_debug` parameter](#using-the-_debug-parameter)
@@ -1345,7 +1350,7 @@ export async function POST (context) {
 This will prevent it from being shown in either your OpenAPI or JSON schema
 outputs.
 
-## Streaming and LLM Support
+## Streaming and LLM support
 
 Instant API comes with built-in support for streaming
 [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
@@ -1460,6 +1465,67 @@ data: {"id":"chatcmpl-8DPoluIgN4TDIuE1usFOKTLPiIUbQ","object":"chat.completion.c
 event: @response
 data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a7cf71946f19","X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling 💯 today! Full of energy and ready to help you out. How about you? How are you doing? 🌈😊\"}"}
 ```
+
+## Background execution for webhooks and chatbots
+
+When you are developing against external webhooks, especially chatbots,
+sometimes it is important to immediately return a `200 OK` response to a third
+party server to acknowledge receipt of the message. Instant API comes
+packaged with a "magic" `_background` parameter which can enable background
+execution on specified endpoints: the endpoint will return `200 OK` instantly
+and continue processing as normal behind the scenes.
+
+### `@background` directive
+
+To enable background processing for an endpoint, simply add a `@background` directive
+to the endpoint's JSDoc comment block:
+
+```javascript
+/**
+ * @background
+ */
+export async function GET (context) {
+
+  const params = context.params; // Get all JSON params sent to endpoint
+
+  // pseudocode
+  await doSomethingThatTakesAwhile();
+  await sendDiscordMessage();
+  return {"complete": true};
+
+}
+```
+
+### Using the `_background` parameter
+
+Background-enabled functions won't execute as background functions by default, you have to
+supply them with the `_background` query or body parameter.
+
+If you execute the above endpoint normally, like `localhost:8000/my-webhook`, you would get;
+
+```json
+{"complete": true}
+```
+
+However, if you execute using `localhost:8000/my-webhook?_background` you see:
+
+```
+initiated "my-webhook#GET" ...
+```
+
+That means it's working as expected.
+
+### Background modes
+
+Multiple modes are supported for the `@background` directive: `info`, `empty` and `params`.
+
+- `@background info` is the default and equivalent to `@background`, it will always
+  return `initiated function_name ...`
+- `@background empty` returns a completely empty body
+- `@background params` returns all parameters provided to the function
+  - You can choose to return a subset of params by including them in a space-separated list
+  - e.g. `@background params name created_at` would only reflect back `{"name": "...", "created_at": "..."}`
+    if provided
 
 ## Debugging
 
