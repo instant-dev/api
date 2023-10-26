@@ -269,9 +269,9 @@ instant help
 ### Custom installation
 
 **Note:** Most of this documentation will assume you are using the
-[`instant.dev` CLI](https://github.com/instant-dev/). It is the recommended
-get your Instant API project set up, generate new endpoints, manage tests and
-comes with built-in deployment tooling for Vercel or AWS.
+`instant.dev` [command line tool](https://github.com/instant-dev/). It is the
+recommended way to get your Instant API project set up, generate new endpoints,
+manage tests and comes with built-in deployment tooling for Vercel or AWS.
 
 To use Instant API without the command line tools, you can do the following;
 
