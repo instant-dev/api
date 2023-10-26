@@ -4,9 +4,9 @@
 ![npm version](https://img.shields.io/npm/v/@instant.dev/api?label=)
 
 # Build type-safe web APIs with JavaScript, instantly
-## includes spec generation and LLM streaming
+## Spec generation and LLM streaming
 
-Instant API is a framework for building APIs with JavaScript that implements
+**Instant API** is a framework for building APIs with JavaScript that implements
 **type-safety at the HTTP interface**. By doing so, it eliminates the need for
 schema validation libraries entirely. Simply write a JSDoc-compliant comment
 block for a function that represents your API endpoint and stop worrying about
