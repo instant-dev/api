@@ -207,6 +207,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [`@stream` type safety](#stream-type-safety)
    1. [Using `context.stream()`](#using-contextstream)
    1. [Using the `_stream` parameter](#using-the-_stream-parameter)
+      1. [Selectively listening to specific streams](#selectively-listening-to-specific-streams)
 1. [Background execution for webhooks and chatbots](#background-execution-for-webhooks-and-chatbots)
    1. [`@background` directive](#background-directive)
    1. [Using the `_background` parameter](#using-the-_background-parameter)
@@ -1465,6 +1466,14 @@ data: {"id":"chatcmpl-8DPoluIgN4TDIuE1usFOKTLPiIUbQ","object":"chat.completion.c
 event: @response
 data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a7cf71946f19","X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling 💯 today! Full of energy and ready to help you out. How about you? How are you doing? 🌈😊\"}"}
 ```
+
+#### Selectively listening to specific streams
+
+If you do not want to listen to all streams, you can send in the `_stream` parameter as an object
+with keys-value pairs corresponding to the streams you want to listen for. Anything with a truthy value
+will be listened to, and `*` means "all streams".
+
+e.g. `localhost:8000/assistant/?_stream={"chunk":true}` would only listen for a `chunk` stream.
 
 ## Background execution for webhooks and chatbots
 
