@@ -7,7 +7,6 @@ const { Gateway } = InstantAPI;
 
 const FaaSGateway = new Gateway({
   debug: false,
-  root: ROOT,
   defaultTimeout: 1000
 });
 

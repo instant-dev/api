@@ -11,7 +11,6 @@ const parser = new FunctionParser();
 
 const FaaSGateway = new Gateway({
   debug: false,
-  root: ROOT,
   defaultTimeout: 1000
 });
 
