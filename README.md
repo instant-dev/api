@@ -16,8 +16,8 @@ for your API is then automatically generated in both JSON and YAML at
 `localhost:8000/.well-known/openapi.yaml`, respectively.
 
 Additionally, Instant API comes packaged with LLM-focused features to future-proof your
-API in preparation for AI integration. First class support for `text/event-stream` makes
-streaming LLM responses easy,
+API in preparation for AI integration. First class support for Server-Sent Events
+using `text/event-stream` makes streaming LLM responses easy,
 [LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) can
 be set up via a JSON Schema list of your API functions available at at
 `localhost:8000/.well-known/schema.json`, and experimental auto-generation of
@@ -223,13 +223,14 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [OpenAPI Output Example](#openapi-output-example)
    1. [JSON Schema Output Example](#json-schema-output-example)
    1. [Hiding endpoints with `@private`](#hiding-endpoints-with-private)
-1. Streaming and LLM Support
-   1. `@stream` type safety
-   1. Using `context.stream()`
-   1. Using the `_stream` parameter
-1. Debugging
-   1. Using the `_debug` parameter
-1. Built-in Errors
+1. [Streaming and LLM Support](#streaming-and-llm-support)
+   1. [`@stream` type safety](#stream-type-safety)
+   1. [Using `context.stream()`](#using-contextstream)
+   1. [Using the `_stream` parameter](#using-the-_stream-parameter)
+1. [Debugging](#debugging)
+   1. [Using `context.log()` and `context.error()`](#using-contextlog-and-contexterror)
+   1. [Using the `_debug` parameter](#using-the-_debug-parameter)
+1. [Built-in Errors](#built-in-errors)
 1. Testing
    1. via `instant test`
    1. Writing tests
@@ -1365,30 +1366,250 @@ outputs.
 
 ## Streaming and LLM Support
 
+Instant API comes with built-in support for streaming
+[Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+with the `text/event-stream` content type. This allows you to send
+events to a user as they are received, and is ideal for developing
+LLM-based APIs.
 
+Streams are typed events that can be sent via a special `context.stream()`
+method. They must be defined using the `@stream` directive in the JSDoc
+descriptor for your API endpoint. Streams are typed like `@param` and `@returns`,
+and these types are enforced: if you choose to `context.stream(name, payload)` the
+wrong data format in `payload`, your function will throw an error.
+
+By default, functions **will not stream** even when a `@stream` is defined
+and `context.stream()` is called. They will simply accept parameters and output a
+returned response. In order to active streaming, you must pass a `_stream` parameter
+in the HTTP query parameters or body content - this will initiate a Server-Sent Event
+with content type `text/event-stream`.
+
+An example of a simple custom streaming LLM agent endpoint built with Instant API
+is below:
+
+```javascript
+import OpenAI from 'openai';
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
+
+/**
+ * Streams results for our lovable assistant
+ * @param {string} query The question for our assistant
+ * @stream {object}   chunk
+ * @stream {string}   chunk.id
+ * @stream {string}   chunk.object
+ * @stream {integer}  chunk.created
+ * @stream {string}   chunk.model
+ * @stream {object[]} chunk.choices
+ * @stream {integer}  chunk.choices[].index
+ * @stream {object}   chunk.choices[].delta
+ * @stream {?string}  chunk.choices[].delta.role
+ * @stream {?string}  chunk.choices[].delta.content
+ * @returns {object} message
+ * @returns {string} message.content
+ */
+export async function GET (query, context) {
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {role: `system`, content: `You are a lovable, cute assistant that uses too many emojis.`},
+      {role: `user`, content: query}
+    ],
+    model: `gpt-3.5-turbo`,
+    stream: true
+  });
+  const messages = [];
+  for await (const chunk of completion) {
+    // Stream our response as text/event-stream when ?_stream parameter added
+    context.stream('chunk', chunk); // chunk has the schema provided above
+    messages.push(chunk?.choices?.[0]?.delta?.content || '');
+  }
+  return {content: messages.join('')};
+};
+```
 
 ### `@stream` type safety
 
-
+All `@stream` definitions follow the same [Type Safety](#type-safety) rules
+as `@param` and `@returns` directives.
 
 ### Using `context.stream()`
 
+To send a streaming response to the client, use `context.stream(name, payload)`
+where `name` is the name of the stream and `payload` adheres to the correct
+type definition for the stream.
 
+**Note:** You must import `context` properly by adding it as the final parameter
+in your function arguments.
 
 ### Using the `_stream` parameter
 
+By default, **API endpoints will not stream responses**. You must activate a
+Server-Sent event by sending the `_stream` parameter. Provided the endpoint defined
+above, here is what you would receive given different URL accession patterns:
 
+```
+localhost:8000/assistant?query=how%20are%20you%20today?
+```
+
+```json
+{
+  "content": "Hey there! 💁‍♀️ I'm doing great, thank you! 💖✨ How about you? 😊🌈"
+}
+```
+
+Appending `_stream` to your query parameters gives you a live stream between a
+`@begin` and `@response` event, the latter returning an `object.http` payload
+containing the typical expected response for the event:
+
+```
+localhost:8000/assistant?query=how%20are%20you%20today?&_stream
+```
+
+```shell
+id: 2023-10-25T04:29:59.115000000Z/2e7c7860-4a66-4824-98fa-a7cf71946f19
+event: @begin
+data: "2023-10-25T04:29:59.115Z"
+
+[... more events ...]
+
+event: chunk
+data: {"id":"chatcmpl-8DPoluIgN4TDIuE1usFOKTLPiIUbQ","object":"chat.completion.chunk","created":1698208199,"model":"gpt-3.5-turbo-0613","choices":[{"index":0,"delta":{"content":" 💯"},"finish_reason":null}]}
+
+[... more events ...]
+
+event: @response
+data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a7cf71946f19","X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"content\":\"Hey there! 🌞 I'm feeling 💯 today! Full of energy and ready to help you out. How about you? How are you doing? 🌈😊\"}"}
+```
 
 ## Debugging
 
+Sometimes, and especially when dealing with LLMs, you find you have long-running
+endpoints that can be a pain to debug. Instant API exposes two methods, `context.log()`
+and `context.error()` that can be streamed to browser output as a Server-Sent Event
+**even if streaming is not enabled on your endpoint**. Debugging is only available
+when `NODE_ENV=development`.
 
+Simply append `_debug` to your query parameters (or add it to your request body)
+to see `context.log()` and `context.error()` output in real-time.
+
+### Using `context.log()` and `context.error()`
+
+These methods are effectively wrappers for `context.stream('@stdout', payload)` and
+`context.stream('@stderr', payload)` - only they don't require streams to be enabled
+to use. They'll output as streams with the event types `@stdout` and `@stderr`, respectively,
+when the `_debug` parameter is passed in.
 
 ### Using the `_debug` parameter
 
+Given the following endpoint:
+
+```javascript
+const sleep = t => new Promise(res => setTimeout(() => res(), t));
+
+export async function GET (context) {
+  context.log(`Started!`);
+  await sleep(100);
+  context.error(`Oh no.`);
+  await sleep(500);
+  context.log(`OK!`);
+  return {complete: true};
+}
+```
+
+Calling it normally would result in:
+
+```
+localhost:8000/test-debug
+```
+
+```json
+{
+  "complete": true
+}
+```
+
+But appending `_debug` in a `development` environment...
+
+```
+localhost:8000/test-debug?_debug
+```
+
+```shell
+id: 2023-10-26T00:16:42.732000000Z/cae5a3c8-14df-4222-b762-fa3f16645fe7
+event: @begin
+data: "2023-10-26T00:16:42.732Z"
+
+id: 2023-10-26T00:16:42.732000001Z/cae5a3c8-14df-4222-b762-fa3f16645fe7
+event: @stdout
+data: "Started!"
+
+id: 2023-10-26T00:16:42.834000000Z/cae5a3c8-14df-4222-b762-fa3f16645fe7
+event: @stderr
+data: "Oh no."
+
+id: 2023-10-26T00:16:43.337000000Z/cae5a3c8-14df-4222-b762-fa3f16645fe7
+event: @stdout
+data: "OK!"
+
+event: @response
+data: {"statusCode":200,"headers":{"X-Execution-Uuid":"cae5a3c8-14df-4222-b762-fa3f16645fe7","X-Debug":true,"X-Instant-Api":"true","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS, HEAD, PUT, DELETE","Access-Control-Allow-Headers":"","Access-Control-Expose-Headers":"x-execution-uuid, x-debug, x-instant-api, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers, x-execution-uuid","Content-Type":"application/json"},"body":"{\"complete\":true}"}
+```
 
 ## Built-in Errors
 
+As you develop with Instant API, you may encounter varios error types as you test
+the limits and bounds of the framework. They are typically in the format:
 
+```json
+{
+  "error": {
+    "type": "NamedError",
+    "message": "error message",
+    "stack": "",
+    "details": {}
+  }
+}
+```
+
+Note that `error.stack` will **not** appear when `NODE_ENV=production`.
+The `details` object may or may not be present. A list of errors you may encounter
+are below:
+
+| Error Type | Description | Details Object |
+| ---------- | ----------- | -------------- |
+| WellKnownError | Error loading a schema from `/.well-known/` pathname | N/A |
+| ClientError | Generic 4xx, usually 400 (Bad Request) | N/A |
+| ServerError | Generic 5xx, usually 500 (Internal Server Error) | N/A |
+| BadRequestError | Returned when `throw new Error('400: [...]')` is called | N/A |
+| UnauthorizedError | Returned when `throw new Error('401: [...]')` is called | N/A |
+| PaymentRequiredError | Returned when `throw new Error('402: [...]')` is called | N/A |
+| ForbiddenError | Returned when `throw new Error('403: [...]')` is called | N/A |
+| NotFoundError | Returned when `throw new Error('404: [...]')` is called | N/A |
+| ParameterParseError | Could not parse parameters based on content-type | N/A |
+| ParameterError | `@param` validation failed | `{[field]: {message: 'string', invalid: true, mismatch: 'obj.a.b', expected: {type}, actual: {value, type}}}` |
+| ValueError | `@returns` validation failed | Same as `ParameterError`, only with the stream name as the field |
+| StreamParameterError | `@stream` validation failed | Same as `ParameterError`, only with `"returns"` as the field |
+| StreamError | Stream specified with `context.stream()` does not exist | N/A |
+| StreamListenerError | Specific stream `name` via `_stream: {name: true}` does not exist | N/A |
+| OriginError | Invalid `@origin` specified | N/A |
+| DebugError | Could not debug endpoint with `_debug`, usually permission issue | N/A |
+| ExecutionModeError | Could not execute with `_stream` or `_background` because they are not enabled | N/A |
+| TimeoutError | Endpoint took too long to execute. Configurable on gateway initialization. | N/A |
+| FatalError | The gateway had a fatal crash event, status code `500` | N/A | 
+| RuntimeError | An error was thrown during endpoint execution, status code `420` | N/A |
+| InvalidResponseHeaderError | A header specified in an `object.http` return statement was invalid | Object containing invalid headers |
+| AccessSourceError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| AccessPermissionError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| AccessAuthError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| AccessSuspendedError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| OwnerSuspendedError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| OwnerPaymentRequiredError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| RateLimitError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| AuthRateLimitError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| UnauthRateLimitError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| SaveError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| MaintenanceError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| UpdateError | Placeholder: Currently unused, intended for platform gateways. | N/A |
+| AutoformatError | Placeholder: Currently unused, intended error if formatting on static resources goes awry. |
 
 ## Testing
 
