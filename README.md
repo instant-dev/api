@@ -46,7 +46,7 @@ File: `/functions/v1/weather/current.mjs`
  * @param {?string{1..64}} location   Search by location
  * @param {?object}        coords     Provide specific latitude and longitude
  * @param {number{-90,90}} coords.lat Latitude
- * @param {number{-90,90}} coords.lng Longitude
+ * @param {number{-180,180}} coords.lng Longitude
  * @param {string[]}       tags       Nearby locations to include
  * @returns {object} weather             Your weather result
  * @returns {number} weather.temperature Current tmperature of the location
