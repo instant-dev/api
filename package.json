@@ -1,6 +1,6 @@
 {
   "name": "@instant.dev/api",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "An API gateway and framework for turning functions into web services",
   "author": "Keith Horwood <keithwhor@gmail.com>",
   "main": "index.js",

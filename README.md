@@ -16,13 +16,12 @@ for your API is then automatically generated in both JSON and YAML at
 `localhost:8000/.well-known/openapi.yaml`, respectively.
 
 Additionally, Instant API comes packaged with LLM-focused features to future-proof your
-API in preparation for AI integration. First class support for Server-Sent Events
-using `text/event-stream` makes streaming LLM responses easy,
-[LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) can
-be set up via a JSON Schema list of your API functions available at at
-`localhost:8000/.well-known/schema.json`, and experimental auto-generation of
-`localhost:8000/.well-known/ai-plugin.json` enables rapid integration into AI platforms
-like OpenAI plugins.
+API in preparation for AI integration:
+
+- First class support for Server-Sent Events using `text/event-stream` makes streaming LLM responses easy
+- [LLM function calling](https://openai.com/blog/function-calling-and-other-api-updates) can be integrated
+easily via JSON schema output at `localhost:8000/.well-known/schema.json`
+- Experimental auto-generation of `localhost:8000/.well-known/ai-plugin.json`
 
 You will find Instant API is a very full-featured framework despite being an
 early release. It has been in development for six years as the engine behind the
