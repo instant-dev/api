@@ -24,30 +24,10 @@ be set up via a JSON Schema list of your API functions available at at
 `localhost:8000/.well-known/ai-plugin.json` enables rapid integration into AI platforms
 like OpenAI plugins.
 
-## Features
-
-Instant API comes with the following features;
-
-- Parameter validation (query and body) based on JSDoc specification
-  - e.g. `@param {string{5..25}} title` ensures titles is a string between 5 and 25 characters
-- Function-based routing for endpoints: one function = one endpoint
-  - `/functions/v1/path-to/file.mjs` => `example.com/v1/path-to/file`
-- Automatic generation of OpenAPI specification for your endpoints
-  - `/.well-known/openapi.json` and `/.well-known/openapi.yaml`
-  - Mark endpoints as `@private` to prevent display
-- Accepts all common body types interchangeably
-  - `application/json`, `application/x-www-form-urlencoded`, `multipart/form-data`
-- Built-in support for LLM streaming with `text/event-stream`
-- Built-in support for common `application/x-www-form-urlencoded` patterns
-  - For both query parameters and body content
-  - Arrays: `a=1&a=2` OR `a[]=1&a[]=2` OR `a[0]=1&a[1]=2` OR `a=[1,2]`
-  - Objects: `obj.a=1&obj.b=2` OR `obj[a]=1&obj[b]=2` OR `obj={"a":1,"b":2}`
-- Built-in support for handling file data via `Buffer` objects
-  - Can send files via `multipart/form-data` requests
-  - Or as base64-encoded object via: `{"_base64": "[...b64 string...]"}`
-- Simple integration with [Instant ORM](https://github.com/instant-dev/orm)
-- Built-in testing framework to manage automated endpoint tests
-- Hot-reloading when `NODE_ENV=development`
+You will find Instant API is a very full-featured framework despite being an
+early release. It has been in development for six years as the engine behind the
+[Autocode](https://autocode.com) serverless platform where it has horizontally scaled
+to handle over 100M API requests per day. Happy hacking!
 
 ## Quick example: Standard API
 
@@ -231,18 +211,20 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
    1. [Using `context.log()` and `context.error()`](#using-contextlog-and-contexterror)
    1. [Using the `_debug` parameter](#using-the-_debug-parameter)
 1. [Built-in Errors](#built-in-errors)
-1. Testing
-   1. via `instant test`
-   1. Writing tests
-   1. Running tests
-1. Deployment
-   1. via `instant deploy`
-   1. Custom deployments
-1. More Information
-   1. Logging
-   1. Error monitoring
-   1. Middleware
-1. Acknowledgements
+1. [Testing](#testing)
+   1. [Quickstart for tests](#quickstart-for-tests)
+   1. [Custom installation for tests](#custom-installation-for-tests)
+   1. [Writing tests](#writing-tests)
+   1. [Running tests](#running-tests)
+1. [Deployment](#deployment)
+   1. [via `instant deploy`](#via-instant-deploy)
+   1. [Custom deployments](#custom-deployments)
+1. [More Information](#more-information)
+   1. [Logging](#logging)
+   1. [Error monitoring](#error-monitoring)
+   1. [Middleware](#middleware)
+1. [Roadmap and Feedback](#roadmap-and-feedback)
+1. [Acknowledgements](#acknowledgements)
 
 ## Getting Started
 
@@ -1380,7 +1362,7 @@ wrong data format in `payload`, your function will throw an error.
 
 By default, functions **will not stream** even when a `@stream` is defined
 and `context.stream()` is called. They will simply accept parameters and output a
-returned response. In order to active streaming, you must pass a `_stream` parameter
+returned response. In order to activate streaming, you must pass a `_stream` parameter
 in the HTTP query parameters or body content - this will initiate a Server-Sent Event
 with content type `text/event-stream`.
 
@@ -1556,8 +1538,8 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"cae5a3c8-14df-4222-b762-f
 
 ## Built-in Errors
 
-As you develop with Instant API, you may encounter varios error types as you test
-the limits and bounds of the framework. They are typically in the format:
+As you develop with Instant API, you may encounter various error types as you test
+the limits and boundariess of the framework. They are typically in the format:
 
 ```json
 {
@@ -1586,8 +1568,8 @@ are below:
 | NotFoundError | Returned when `throw new Error('404: [...]')` is called | N/A |
 | ParameterParseError | Could not parse parameters based on content-type | N/A |
 | ParameterError | `@param` validation failed | `{[field]: {message: 'string', invalid: true, mismatch: 'obj.a.b', expected: {type}, actual: {value, type}}}` |
-| ValueError | `@returns` validation failed | Same as `ParameterError`, only with the stream name as the field |
-| StreamParameterError | `@stream` validation failed | Same as `ParameterError`, only with `"returns"` as the field |
+| ValueError | `@returns` validation failed | Same as `ParameterError`, only with `"returns"` as the field |
+| StreamParameterError | `@stream` validation failed | Same as `ParameterError`, only with the stream name as the field |
 | StreamError | Stream specified with `context.stream()` does not exist | N/A |
 | StreamListenerError | Specific stream `name` via `_stream: {name: true}` does not exist | N/A |
 | OriginError | Invalid `@origin` specified | N/A |
@@ -1609,49 +1591,336 @@ are below:
 | SaveError | Placeholder: Currently unused, intended for platform gateways. | N/A |
 | MaintenanceError | Placeholder: Currently unused, intended for platform gateways. | N/A |
 | UpdateError | Placeholder: Currently unused, intended for platform gateways. | N/A |
-| AutoformatError | Placeholder: Currently unused, intended error if formatting on static resources goes awry. |
+| AutoformatError | Placeholder: Currently unused, intended error if formatting on static resources goes awry. | N/A |
 
 ## Testing
 
+Instant API comes packaged with a `TestEngine` class for automated testing. It designed
+to work best with [mocha](https://mochajs.org/) and [chai](https://www.chaijs.com/) but
+can be used with any runtime.
 
+### Quickstart for tests
 
-### via `instant test`
+The best way to get started with tests is via the `instant.dev`
+[command line tools](https://github.com/instant-dev/instant). Once your project is initialized,
+you can generate tests for your endpoints with:
 
+```shell
+instant g:test --function path/to/index.mjs
+```
 
+Where `./functions/path/to/index.mjs` is an endpoint. This will automatically create
+a test for each exported function (HTTP method) on the endpoint in:
+`./test/tests/functions/path/to/index.mjs`.
+
+Additionally, if you are using [Instant ORM](https://github.com/instant-dev/orm), you can
+generate tests for individual models using:
+
+```shell
+instant g:test --model users
+```
+
+Which will create a test in `./test/tests/models/user.js`.
+
+Finally, To create blank (empty) tests use:
+
+```shell
+instant g:test path/to/my_test_name
+```
+
+Which will create an empty test in `./test/tests/path/to/my_test_name.mjs`.
+
+Tests can be run via:
+
+```shell
+instant test
+```
+
+### Custom installation for tests
+
+If you want to write your own tests without using the `instant.dev`
+[command line tools](https://github.com/instant-dev/instant), you should
+first install `mocha` and `chai`.
+
+```shell
+npm i mocha --save-dev
+npm i chai --save-dev
+```
+
+Next, create the file `./test/run.mjs` with the following contents:
+
+```javascript
+import InstantAPI from '@instant.dev/api';
+
+const Gateway = InstantAPI.Gateway;
+const TestEngine = InstantAPI.TestEngine;
+const PORT = 7357; // Leetspeak for "TEST"; can be anything
+
+// Load environment variables; make sure NODE_ENV is "test"
+process.env.NODE_ENV = `test`;
+
+// Initialize and load tests; set PORT for request mocking
+const testEngine = new TestEngine(PORT);
+await testEngine.initialize('./test/tests');
+
+// Setup; create objects and infrastructure for tests
+// Arguments returned here will be sent to .finish()
+testEngine.setup(async () => {
+
+  console.log();
+  console.log(`# Starting test gateway on localhost:${PORT} ... `);
+  console.log();
+
+  // Start Gateway; {debug: true} will print logs
+  const gateway = new Gateway({debug: false});
+  gateway.load(process.cwd());       // load routes from filesystem
+  gateway.listen(PORT);              // start server
+
+  return { gateway };
+
+});
+
+// Run tests; use first argument to specify a test
+const args = process.argv.slice(3);
+if (args[0]) {
+  await testEngine.run(args[0]);
+} else {
+  await testEngine.runAll();
+}
+
+// Finish; close Gateway and disconnect from database
+// Receive arguments from .setup()
+testEngine.finish(async ({ gateway }) => {
+  gateway.close();
+});
+```
+
+Finally, you can then add the following to `package.json`:
+
+```json
+  "scripts": {
+    "test": "mocha test/run.mjs"
+  }
+```
+
+Tests can then be run via:
+
+```shell
+npm test
+```
 
 ### Writing tests
 
+All tests should be put in the `./test/tests` directory. This directory
+will be used by `TestEngine` to load all of your tests. Tests are imported
+**when they are run**, not when they are first initialized in `TestEngine`.
 
+The structure of a test should look like this;
+
+```javascript
+// Imports, setup to begin with
+import chai from 'chai';
+const expect = chai.expect;
+
+// Optional: Name your test file
+export const name = `Some tests`;
+
+/**
+ * Your tests
+ * @param {any} setupResult Result of the function passed to `.setup()` in `test/run.mjs`
+ */
+export default async function (setupResult) {
+
+  before(async () => {
+    // any necessary setup
+  });
+
+  it('Should test for truthiness of "true"', async () => {
+
+    expect(true).to.equal(true);
+
+  });
+
+  after(async () => {
+    // any necessary teardown
+  });
+
+};
+```
 
 ### Running tests
 
+Tests are run top-down, depth-first, alphabetically.
+Given the following directory structure:
 
+```yaml
+- test/
+  - tests/
+    - a/
+      - second.mjs
+      - a/third.mjs
+      - b/fourth.mjs
+    - b/
+      - fifth.mjs
+    - first.mjs
+
+```
+
+- All tests in the root `test/tests` directory are executed first, alphabetically
+- All directories in `test/tests` are organized alphabetically
+- All tests in `test/tests/a/` would then run
+- Then tests in `test/tests/a/a/`
+- Then tests in `test/tests/a/b/`
+- then tests in `test/tests/b/`
+
+Giving a test order of:
+
+```yaml
+- test/tests/first.mjs
+- test/tests/a/second.mjs
+- test/tests/a/a/third.mjs
+- test/tests/a/b/fourth.mjs
+- test/tests/b/fifth.mjs
+```
+
+If you set up via `instant.dev` [command line tools](https://github.com/instant-dev/instant),
+just run:
+
+```shell
+instant test
+```
+
+If you are running a custom installation, use:
+
+```shell
+npm test
+```
 
 ## Deployment
 
-
+Instant API can be deployed out-of-the-box to any host that respects the
+`[package.json].scripts.start` field. This includes AWS Elastic Beanstalk and Heroku.
+Vercel requires a little bit of finagling. However, the `instant.dev`
+[command line tools](https://github.com/instant-dev/instant) will automatically
+manage deployments to both AWS Elastic Beanstalk and Vercel for you.
 
 ### via `instant deploy`
 
+Simple;
 
+```shell
+instant deploy:config # follow instructions; choose Vercel or AWS
+instant deploy --env staging # for Elastic Beanstalk
+instant deploy --env preview # for Vercel
+instant deploy --env production # Works for either
+```
 
 ### Custom deployments
 
-
+We defer to platform-specific Node.js deployment instructions. If you would
+like to contribute some helpful tips, please submit a PR on this README!
 
 ## More Information
 
+### Gateway Configuration
 
+You can configure some custom options in your `instant.mjs` startup script.
+
+```javascript
+import InstantAPI from '@instant.dev/api';
+
+// ... other code ...
+
+const Gateway = InstantAPI.Daemon.Gateway;
+
+const gateway = new Gateway({
+  port: 8000, //Defaults to 8170
+  name: 'My API Server', // Defaults to "InstantAPI.Gateway"
+  maxRequestSizeMB: 16, // Requests above this size will error. Defaults to 128MB.
+  defaultTimeout: 10000 // Max execution time in ms. Defaults to 600000 (10 mins).
+  debug: true // Whether to show logs or not, defaults to false
+});
+```
 
 ### Logging
 
-
+Currently logging is controlled entirely via the `debug` parameter in
+`new Gateway()` instatiation. When set to `true` this can very quickly overwhelm
+log storage on high-volume API servers. We're interested in getting feedback
+on your favorite log draining solutions and if there are elegant ways to integrate.
+Submit an issue to talk to us about it!
 
 ### Error monitoring
 
+The `Gateway` instant comes with a built-in `setErrorHandler()` method to
+capture internal errors. You can add it to `instant.mjs` or your startup script easily.
+Here's an example using [Sentry](https://sentry.io):
 
+```javascript
+import InstantAPI from '@instant.dev/api';
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+  dsn: '__DSN__',
+  // ...
+});
+
+// ... other code ...
+
+const Gateway = InstantAPI.Daemon.Gateway;
+
+const gateway = new Gateway({port: process.env.PORT});
+gateway.setErrorHandler(e => Sentry.captureException(e));
+gateway.load(process.cwd());
+gateway.listen();
+```
+
+This will catch all internal errors with the exception of;
+
+- Validation errors:
+  - ExecutionModeError, ParameterParseError, ParameterError, StreamError, StreamParameterError
+- Intentionally thrown client errors:
+  - BadRequestError, UnauthorizedError, PaymentRequiredError, ForbiddenError, NotFoundError
 
 ### Middleware
+
+For the most part, Instant API has pretty comprehensive body parsing and parameter
+validation libraries built right in. However, you still might want to write or use
+custome middleware for repeated tasks; like authenticating users based on `headers`.
+
+We recommend a simple approach of a `middleware/` directory with files that each output
+a function that takes `context` as a single argument:
+
+e.g. in `./middleware/authenticate.mjs`
+
+```javascript
+export default async (context) {
+  let headers = context.https.headers;
+  let result = await authenticateUser(headers);
+  if (result) {
+    return true;
+  } else {
+    throw new Error(`401: Unauthorized, failed header validation`);
+  }
+}
+```
+
+Then in your endpoints, you can do the following;
+
+```javascript
+import authenticate from '../middleware/authenticate.mjs`;
+
+export async function GET (context) => {
+  await authenticate(context);
+  return 'authenticated!';
+}
+```
+
+## Roadmap and Feedback
+
+We're just getting the first release of Instant API into the wild now, we're excited to hear feedback!
+It's a pretty comprehensive framework we've been developing for years and we're happy with the feature
+set, but please let us know if there are things we are missing by opening an issue.
 
 # Acknowledgements
 
