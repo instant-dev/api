@@ -43,11 +43,11 @@ File: `/functions/v1/weather/current.mjs`
 ```javascript
 /**
  * Retrieve the weather for a specific location
- * @param {?string{1..64}} location   Search by location
- * @param {?object}        coords     Provide specific latitude and longitude
- * @param {number{-90,90}} coords.lat Latitude
- * @param {number{-180,180}} coords.lng Longitude
- * @param {string[]}       tags       Nearby locations to include
+ * @param {?string{1..64}}   location    Search by location
+ * @param {?object}          coords      Provide specific latitude and longitude
+ * @param {number{-90,90}}   coords.lat  Latitude
+ * @param {number{-180,180}} coords.lng  Longitude
+ * @param {string[]}         tags        Nearby locations to include
  * @returns {object} weather             Your weather result
  * @returns {number} weather.temperature Current tmperature of the location
  * @returns {string} weather.unit        Fahrenheit or Celsius
