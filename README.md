@@ -441,7 +441,7 @@ const User = Instant.Model('User'); // access User model
 export async function GET (searchQuery) {
   // Executed each time endpoint called
   return await User.query()
-    .where({username__icontains: searchUsername})
+    .where({username__icontains: searchQuery})
     .select();
 }
 ```
