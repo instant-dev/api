@@ -440,6 +440,137 @@ export default async function (setupResult) {
 
   });
 
+  it('Should respect the type "boolean|string(hello)" options with a boolean', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/', {value: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json.value).to.equal(true)
+
+  });
+
+  it('Should respect the type "boolean|string(hello)" options with the string "hello"', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/', {value: 'hello'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json.value).to.equal("hello");
+
+  });
+
+  it('Should reject the type "boolean|string(hello)" options with an integer', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/', {value: 1});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details).to.exist;
+    expect(res.json.error.details.value).to.exist
+
+  });
+
+  it('Should reject the type "boolean|string(hello)" options with an invalid string', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/', {value: 'true'});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details).to.exist;
+    expect(res.json.error.details.value).to.exist
+
+  });
+
+  it('Should sanitize the type "boolean|string(hello)" to a boolean', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/?value=true', '');
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json.value).to.equal(true);
+
+  });
+
+  it('Should sanitize the type "boolean|string(hello)" to a boolean (t)', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/?value=t', '');
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json.value).to.equal(true)
+
+  });
+
+  it('Should sanitize the type "boolean|string(hello)" to the string "hello"', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/?value=hello', '');
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json.value).to.equal("hello")
+
+  });
+
+  it('Should reject the type "boolean|string(hello)" options with an invalid string', async () => {
+    
+    let res = await this.post('/esm/boolean_or_custom_string/?value=lol', '');
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details).to.exist;
+    expect(res.json.error.details.value).to.exist
+
+  });
+
   it('Should accept a string with size restriction between 2 and 5 with length', async () => {
     
     let res = await this.post('/esm/sizes/', {mystr: 'lol'});
