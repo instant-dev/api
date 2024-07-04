@@ -304,6 +304,42 @@ export default async function (setupResult) {
 
   });
 
+  it('Should respect ESM-defined top-level array and fail if value invalid', async () => {
+    
+    let res = await this.post('/esm/nested_top_level_array/', {arr: [{num: 'xx'}]});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details).to.exist;
+    expect(res.json.error.details.arr).to.exist;
+    expect(res.json.error.details.arr.mismatch).to.equal('arr[0].num');
+
+  });
+
+  it('Should respect ESM-defined top-level array and succeed if valid', async () => {
+    
+    let res = await this.post('/esm/nested_top_level_array/', {arr: [{num: 10, obj: {num: 99, str: 'lol'}}]});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json).to.deep.equal({
+      arr: [{num: 10, obj: {num: 99, str: 'lol'}}],
+    });
+
+  });
+
   it('Should respect the type "any" options property', async () => {
     
     let res = await this.post('/esm/any_options/', {value: 1});
