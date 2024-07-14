@@ -4,5 +4,6 @@ module.exports = {
   Gateway: require('./lib/gateway.js'),
   EncryptionTools: require('@instant.dev/encrypt'),
   TestEngine: require('./lib/test_engine/test_engine.js'),
-  types: require('./lib/types.js')
+  types: require('./lib/types.js'),
+  wellKnowns: require('./lib/well-knowns.js')
 };
