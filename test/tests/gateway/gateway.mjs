@@ -4850,6 +4850,86 @@ export default async function (setupResult) {
 
   });
 
+  it('Should error when you try to retrieve a platform key', async () => {
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(420);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('This function does not have access to platform keys.');
+
+  });
+
+  it('Should error when you try to retrieve a specific key for "hello"', async () => {
+
+    process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}});
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(420);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('You do not currently have access to "hello" platform keys.');
+
+  });
+
+  it('Should error when you try to retrieve a specific key for "hello", when enabled is false', async () => {
+
+    process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}, hello: {enabled: false}});
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(420);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('You do not currently have access to "hello" platform keys.');
+
+  });
+
+  it('Should succeed with null when you try to retrieve a specific key for "hello", when enabled is true', async () => {
+
+    process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}, hello: {enabled: true}});
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.key).to.equal(null);
+
+  });
+
+  it('Should succeed with "beans" when you try to retrieve "cool" key for "hello", when set', async () => {
+
+    process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}, hello: {enabled: true, cool: 'beans'}});
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.key).to.equal('beans');
+
+  });
+
+  it('Should error again when you try to retrieve a platform key, when env variables not set', async () => {
+
+    delete process.env.__PLATFORM_KEYS;
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(420);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('This function does not have access to platform keys.');
+
+  });
+
   after(() => FaaSGateway.close());
 
 };
