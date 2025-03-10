@@ -4850,11 +4850,11 @@ export default async function (setupResult) {
 
   });
 
-  it('Should error when you try to retrieve a platform key', async () => {
+  it('Should error when you try to retrieve a platform scope', async () => {
 
     let res = await this.post('/context/basic/', {});
 
-    expect(res.statusCode).to.equal(420);
+    expect(res.statusCode).to.equal(403);
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
     expect(res.json.error).to.exist;
@@ -4868,11 +4868,11 @@ export default async function (setupResult) {
 
     let res = await this.post('/context/basic/', {});
 
-    expect(res.statusCode).to.equal(420);
+    expect(res.statusCode).to.equal(403);
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
     expect(res.json.error).to.exist;
-    expect(res.json.error.message).to.contain('You do not currently have access to "hello" platform keys.');
+    expect(res.json.error.message).to.contain('This function only works when called from "hello".');
 
   });
 
@@ -4882,24 +4882,38 @@ export default async function (setupResult) {
 
     let res = await this.post('/context/basic/', {});
 
-    expect(res.statusCode).to.equal(420);
+    expect(res.statusCode).to.equal(403);
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
     expect(res.json.error).to.exist;
-    expect(res.json.error.message).to.contain('You do not currently have access to "hello" platform keys.');
+    expect(res.json.error.message).to.contain('This function only works when called from "hello".');
 
   });
 
-  it('Should succeed with null when you try to retrieve a specific key for "hello", when enabled is true', async () => {
+  it('Should error when you try to retrieve a specific key for "hello", when enabled is true but key is missing', async () => {
 
     process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}, hello: {enabled: true}});
+
+    let res = await this.post('/context/basic/', {});
+
+    expect(res.statusCode).to.equal(403);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('This function requires the platform key "hello"."cool" which is missing.');
+
+  });
+
+  it('Should succeed with null when you try to retrieve a specific key for "hello", when enabled is true and key is present', async () => {
+
+    process.env.__PLATFORM_KEYS = JSON.stringify({global: {enabled: true}, hello: {enabled: true, cool: 'beans'}});
 
     let res = await this.post('/context/basic/', {});
 
     expect(res.statusCode).to.equal(200);
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
-    expect(res.json.key).to.equal(null);
+    expect(res.json.key).to.equal('beans');
 
   });
 
@@ -4922,11 +4936,23 @@ export default async function (setupResult) {
 
     let res = await this.post('/context/basic/', {});
 
-    expect(res.statusCode).to.equal(420);
+    expect(res.statusCode).to.equal(403);
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
     expect(res.json.error).to.exist;
     expect(res.json.error.message).to.contain('This function does not have access to platform keys.');
+
+  });
+
+  it('Should error when you try to retrieve a keychain key that has not been provided', async () => {
+
+    let res = await this.post('/context/keychain/', {});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json.error).to.exist;
+    expect(res.json.error.message).to.contain('This function requires the keychain key "hello", which has not been provided.');
 
   });
 

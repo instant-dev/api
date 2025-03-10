@@ -3,7 +3,7 @@
 */
 module.exports = async (context) => {
 
-  const value = context.platform.getKey('hello', 'cool');
+  const value = context.platform.ui('hello').key('cool');
 
   return { key: value };
 
