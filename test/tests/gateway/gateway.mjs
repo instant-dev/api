@@ -4944,7 +4944,7 @@ export default async function (setupResult) {
 
   });
 
-  it('Should error when you try to retrieve a keychain key that has not been provided', async () => {
+  it('Should error when you try to retrieve a keychain key that has not been requested', async () => {
 
     let res = await this.post('/context/keychain/', {});
 
@@ -4952,7 +4952,7 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
     expect(res.json).to.exist;
     expect(res.json.error).to.exist;
-    expect(res.json.error.message).to.contain('This function requires the keychain key "hello", which has not been provided.');
+    expect(res.json.error.message).to.contain('This function is attempting to read the keychain key "hello" which it has not requested permission to access.');
 
   });
 
