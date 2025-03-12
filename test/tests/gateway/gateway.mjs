@@ -83,7 +83,7 @@ export default async function (setupResult) {
 
   it('Should return 404 + NotFoundError for not found function', async () => {
 
-    let res = await this.get('/', '');
+    let res = await this.get('/DOES_NOT_EXIST', '');
 
     expect(res.statusCode).to.equal(404);
     expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
@@ -4841,12 +4841,24 @@ export default async function (setupResult) {
     expect(res.json.functions).to.exist;
     expect(res.json.functions.length).to.be.greaterThan(1);
     expect(res.json.functions.find(fn => fn.name === 'my_function')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_function')).to.exist;
     expect(res.json.functions.find(fn => fn.name === 'my_function_private')).to.not.exist;
-    expect(res.json.functions.find(fn => fn.name === 'my_esm_function')).to.exist;
+    expect(res.json.functions.find(fn => fn.name === 'my_esm_function')).to.not.exist;
     expect(res.json.functions.find(fn => fn.name === 'my_esm_function_get')).to.exist;
     expect(res.json.functions.find(fn => fn.name === 'my_esm_function_delete')).to.exist;
     expect(res.json.functions.find(fn => fn.name === 'my_esm_function_put')).to.exist;
-    expect(res.json.functions.find(fn => fn.name === 'my_esm_function_post')).to.not.exist;
+    expect(res.json.functions.find(fn => fn.name === 'my_esm_function_post')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function')).to.not.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function#GET')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function#DELETE')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function#PUT')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function#POST')).to.exist;
+    expect(res.json.functions.find(fn => fn.name === 'my_esm_function_default')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'my_esm_function_default')).to.exist;
+    expect(res.json.functions.find(fn => fn.name === '_')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === '')).to.exist;
+    expect(res.json.functions.find(fn => fn.name === 'test-notfound')).to.exist;
+    expect(res.json.functions.find(fn => fn.endpoint_name === 'test:notfound')).to.exist;
 
   });
 
