@@ -2944,6 +2944,30 @@ export default async function (setupResult) {
 
   });
 
+  it('Should return a buffer properly with a .contentType set (streaming)', async () => {
+
+    let res = await this.post('/buffer_return_content_type/?_stream', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('text/event-stream; charset=utf-8');
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['hello']).to.exist;
+    expect(events['hello'][0]).to.equal('"world"');
+    expect(events['@response']).to.exist;
+
+    const response = JSON.parse(events['@response']);
+    expect(response.statusCode).to.equal(200);
+    expect(response.headers['Content-Type']).to.equal('image/png');
+    expect(response.body).to.exist;
+
+    const body = JSON.parse(response.body);
+    expect(body._base64).to.exist;
+    expect(Buffer.from(body._base64, 'base64').toString()).to.equal('lol');
+
+  });
+
   it('Should return a nested buffer properly', async () => {
 
     let res = await this.post('/buffer_nested_return/', {});
