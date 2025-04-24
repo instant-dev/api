@@ -719,7 +719,7 @@ export default async function (setupResult) {
     let res = await this.post('/http_body/', {abc: 123});
 
     expect(res.statusCode).to.equal(200);
-    expect(res.json).to.be.a.string;
+    expect(res.json).to.be.a('string');
     expect(res.json).to.equal('{"abc":123}');
 
   });
@@ -4049,6 +4049,36 @@ export default async function (setupResult) {
 
   });
 
+  it('Should support POST with streaming with _stream set, streams a valid date', async () => {
+
+    let res = await this.post('/stream/date/', {alpha: 'hello', _stream: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
+    expect(res.body).to.exist;
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['hello']).to.exist;
+
+    expect(events['hello'][0]).to.exist;
+    let hello_0 = JSON.parse(events['hello'][0]);
+    console.log(hello_0);
+    expect(hello_0.date).to.be.a('string');
+
+    expect(events['hello'][1]).to.exist;
+    let hello_1 = JSON.parse(events['hello'][1]);
+    expect(hello_1.deep).to.exist;
+    expect(hello_1.deep.date).to.be.a('string');
+
+    expect(events['@response']).to.exist;
+
+    let response = JSON.parse(events['@response'][0]);
+    expect(response.headers['Content-Type']).to.equal('application/json');
+    expect(response.body).to.equal('true');
+
+  });
+
   it('Should support POST with streaming (buffer) with _stream set', async () => {
 
     let res = await this.post('/stream/basic_buffer/', {alpha: 'hello', _stream: true});
@@ -4273,7 +4303,7 @@ export default async function (setupResult) {
 
     expect(events['@begin']).to.exist;
     expect(events['@begin'].length).to.equal(1);
-    expect(events['@begin'][0]).to.be.a.string;
+    expect(events['@begin'][0]).to.be.a('string');
 
     expect(events['@response']).to.exist;
     let response = JSON.parse(events['@response'][0]);
@@ -4307,7 +4337,7 @@ export default async function (setupResult) {
 
     expect(events['@begin']).to.exist;
     expect(events['@begin'].length).to.equal(1);
-    expect(events['@begin'][0]).to.be.a.string;
+    expect(events['@begin'][0]).to.be.a('string');
 
     expect(events['@stdout']).to.exist;
     expect(events['@stdout'].length).to.equal(2);
@@ -4350,7 +4380,7 @@ export default async function (setupResult) {
 
     expect(events['@begin']).to.exist;
     expect(events['@begin'].length).to.equal(1);
-    expect(events['@begin'][0]).to.be.a.string;
+    expect(events['@begin'][0]).to.be.a('string');
 
     expect(events['@stdout']).to.exist;
     expect(events['@stdout'].length).to.equal(2);
@@ -4383,7 +4413,7 @@ export default async function (setupResult) {
 
     expect(events['@begin']).to.exist;
     expect(events['@begin'].length).to.equal(1);
-    expect(events['@begin'][0]).to.be.a.string;
+    expect(events['@begin'][0]).to.be.a('string');
 
     expect(events['hello']).to.exist;
     expect(events['hello'].length).to.equal(1);
@@ -4439,7 +4469,7 @@ export default async function (setupResult) {
 
     expect(events['@begin']).to.exist;
     expect(events['@begin'].length).to.equal(1);
-    expect(events['@begin'][0]).to.be.a.string;
+    expect(events['@begin'][0]).to.be.a('string');
 
     expect(events['@stdout']).to.exist;
     expect(events['@stdout'].length).to.equal(2);
