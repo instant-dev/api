@@ -1393,6 +1393,24 @@ export default async function (setupResult) {
     expect(res.json.error).to.exist;
     expect(res.json.error.type).to.equal('UpdateError');
 
+  });
+
+  it('Should register an error in the resolve step with type ConflictError', async () => {
+
+    let originalResolveFn = FaaSGateway.resolve;
+    FaaSGateway.resolve = (req, res, buffer, callback) => {
+      let error = new Error('There is a conflict with the request.');
+      error.conflictError = true;
+      return callback(error);
+    };
+
+    let res = await this.post('/my_function/', {});
+
+    FaaSGateway.resolve = originalResolveFn;
+
+    expect(res.statusCode).to.equal(409);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.type).to.equal('ConflictError');
 
   });
 
