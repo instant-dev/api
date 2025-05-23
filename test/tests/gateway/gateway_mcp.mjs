@@ -364,7 +364,130 @@ export default async function (setupResult) {
     expect(res.json[0].jsonrpc).to.equal('2.0');
     expect(res.json[0].id).to.equal(1);
     expect(res.json[0].result).to.exist;
-    
+    expect(res.json[0].result.content).to.exist;
+    expect(res.json[0].result.content.length).to.equal(1);
+    expect(res.json[0].result.content[0].type).to.equal('text');
+    expect(res.json[0].result.content[0].text).to.equal('6');
+    expect(res.json[0].result.isError).to.equal(false);
+
+  });
+
+  it('Should return an tools/call response and succeed for "my_function" tool multiple times with different arguments', async () => {
+
+    let res = await this.post(
+      '/server.mcp',
+      [
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: { name: 'my_function', arguments: { a: 1, b: 2, c: 1 } }
+        },
+        {
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/call',
+          params: { name: 'my_function', arguments: { a: 3, b: 3, c: 3 } }
+        },
+        {
+          jsonrpc: '2.0',
+          id: 3,
+          method: 'tools/call',
+          params: { name: 'my_function', arguments: { a: 'noooo', b: 3, c: 3 } }
+        }
+      ]
+    );
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json[0]).to.exist;
+    expect(res.json[0].jsonrpc).to.equal('2.0');
+    expect(res.json[0].id).to.equal(1);
+    expect(res.json[0].result).to.exist;
+    expect(res.json[0].result.content).to.exist;
+    expect(res.json[0].result.content.length).to.equal(1);
+    expect(res.json[0].result.content[0].type).to.equal('text');
+    expect(res.json[0].result.content[0].text).to.equal('4');
+    expect(res.json[0].result.isError).to.equal(false);
+
+    expect(res.json[1]).to.exist;
+    expect(res.json[1].jsonrpc).to.equal('2.0');
+    expect(res.json[1].id).to.equal(2);
+    expect(res.json[1].result).to.exist;
+    expect(res.json[1].result.content).to.exist;
+    expect(res.json[1].result.content.length).to.equal(1);
+    expect(res.json[1].result.content[0].type).to.equal('text');
+    expect(res.json[1].result.content[0].text).to.equal('9');
+    expect(res.json[1].result.isError).to.equal(false);
+
+    expect(res.json[2]).to.exist;
+    expect(res.json[2].jsonrpc).to.equal('2.0');
+    expect(res.json[2].id).to.equal(3);
+    expect(res.json[2].result).to.exist;
+    expect(res.json[2].result.content).to.exist;
+    expect(res.json[2].result.content.length).to.equal(1);
+    expect(res.json[2].result.content[0].type).to.equal('text');
+    expect(res.json[2].result.content[0].text).to.contain('error');
+    expect(res.json[2].result.isError).to.equal(true);
+
+  });
+
+  it('Should return an tools/call response with an image and a buffer', async () => {
+
+    let res = await this.post(
+      '/server.mcp',
+      [
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: { name: 'buffer_return_content_type', arguments: {} }
+        },
+        {
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/call',
+          params: { name: 'buffer_return', arguments: {} }
+        }
+      ]
+    );
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json[0]).to.exist;
+    expect(res.json[0].jsonrpc).to.equal('2.0');
+    expect(res.json[0].id).to.equal(1);
+    expect(res.json[0].result).to.exist;
+    expect(res.json[0].result.content).to.exist;
+    expect(res.json[0].result.content.length).to.equal(1);
+    expect(res.json[0].result.content[0].type).to.equal('image');
+    expect(res.json[0].result.content[0].data).to.equal(Buffer.from('lol').toString('base64'));
+    expect(res.json[0].result.content[0].mimeType).to.equal('image/png');
+    expect(res.json[0].result.isError).to.equal(false);
+
+    expect(res.json[1]).to.exist;
+    expect(res.json[1].jsonrpc).to.equal('2.0');
+    expect(res.json[1].id).to.equal(2);
+    expect(res.json[1].result).to.exist;
+    expect(res.json[1].result.content).to.exist;
+    expect(res.json[1].result.content.length).to.equal(1);
+    expect(res.json[1].result.content[0].type).to.equal('resource');
+    expect(res.json[1].result.content[0].resource.uri).to.equal('temporary://none');
+    expect(res.json[1].result.content[0].resource.mimeType).to.equal('application/octet-stream');
+    expect(res.json[1].result.content[0].resource.blob).to.equal(Buffer.from('lol').toString('base64'));
+    expect(res.json[1].result.isError).to.equal(false);
+
   });
 
   after(() => FaaSGateway.close());
