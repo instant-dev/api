@@ -21,7 +21,17 @@ export default async function (setupResult) {
     FaaSGateway.listen(PORT);
   });
 
-  it('Should return a valid MCP endpoint', async () => {
+  it('Should fail to return a MCP endpoint if MCP is not enabled', async () => {
+
+    let res = await this.post('/server.mcp', {});
+
+    expect(res.statusCode).to.equal(404);
+
+  });
+
+  it('Should return a valid MCP endpoint once MCP is enabled', async () => {
+
+    process.env.MCP_ENABLED = 'true';
 
     let res = await this.post('/server.mcp', {});
 
@@ -564,6 +574,9 @@ export default async function (setupResult) {
 
   });
 
-  after(() => FaaSGateway.close());
+  after(() => {
+    delete process.env.MCP_ENABLED;
+    FaaSGateway.close();
+  });
 
 };
