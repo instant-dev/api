@@ -5,5 +5,6 @@ module.exports = {
   EncryptionTools: require('@instant.dev/encrypt'),
   TestEngine: require('./lib/test_engine/test_engine.js'),
   types: require('./lib/types.js'),
-  wellKnowns: require('./lib/well-knowns.js')
+  wellKnowns: require('./lib/well_knowns.js'),
+  modelContextProtocol: require('./lib/model_context_protocol.js')
 };
