@@ -331,7 +331,7 @@ export default async function (setupResult) {
 
   it('Should return an tools/list response', async () => {
 
-    let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
+    let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'tools/list' });
 
     expect(res.statusCode).to.equal(200);
     expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
