@@ -103,12 +103,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(null);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32600);
-    expect(res.json[0].error.message).to.contain('invalid "jsonrpc"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(null);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32600);
+    expect(res.json.error.message).to.contain('invalid "jsonrpc"');
 
   });
 
@@ -124,12 +123,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(null);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32600);
-    expect(res.json[0].error.message).to.contain('invalid "jsonrpc"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(null);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32600);
+    expect(res.json.error.message).to.contain('invalid "jsonrpc"');
 
   });
 
@@ -145,12 +143,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(null);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32600);
-    expect(res.json[0].error.message).to.contain('invalid "id"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(null);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32600);
+    expect(res.json.error.message).to.contain('invalid "id"');
 
   });
 
@@ -166,12 +163,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32600);
-    expect(res.json[0].error.message).to.contain('invalid "method"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32600);
+    expect(res.json.error.message).to.contain('invalid "method"');
 
   });
 
@@ -187,12 +183,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32600);
-    expect(res.json[0].error.message).to.contain('invalid "params"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32600);
+    expect(res.json.error.message).to.contain('invalid "params"');
 
   });
 
@@ -208,12 +203,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32601);
-    expect(res.json[0].error.message).to.contain('Method "invalid" not found');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32601);
+    expect(res.json.error.message).to.contain('Method "invalid" not found');
 
   });
 
@@ -274,11 +268,10 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result).to.deep.equal({});
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result).to.deep.equal({});
   });
 
   it('Should return multiple ping responses', async () => {
@@ -321,19 +314,18 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.protocolVersion).to.equal('2025-03-26');
-    expect(res.json[0].result.capabilities).to.exist;
-    expect(res.json[0].result.capabilities.tools).to.exist;
-    expect(res.json[0].result.capabilities.tools).to.deep.equal({});
-    expect(res.json[0].result.capabilities.resources).to.exist;
-    expect(res.json[0].result.capabilities.resources).to.deep.equal({});
-    expect(res.json[0].result.serverInfo).to.exist;
-    expect(res.json[0].result.serverInfo.name).to.equal('MyMCPServer');
-    expect(res.json[0].result.serverInfo.version).to.equal('1.0');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.protocolVersion).to.equal('2025-03-26');
+    expect(res.json.result.capabilities).to.exist;
+    expect(res.json.result.capabilities.tools).to.exist;
+    expect(res.json.result.capabilities.tools).to.deep.equal({});
+    expect(res.json.result.capabilities.resources).to.exist;
+    expect(res.json.result.capabilities.resources).to.deep.equal({});
+    expect(res.json.result.serverInfo).to.exist;
+    expect(res.json.result.serverInfo.name).to.equal('MyMCPServer');
+    expect(res.json.result.serverInfo.version).to.equal('1.0');
 
   });
 
@@ -349,23 +341,22 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.tools).to.exist;
-    expect(res.json[0].result.tools.length).to.be.greaterThan(0);
-    expect(res.json[0].result.tools[0].name).to.exist;
-    expect(res.json[0].result.tools[0].description).to.exist;
-    expect(res.json[0].result.tools[0].inputSchema).to.exist;
-    expect(res.json[0].result.tools[0].annotations).to.exist;
-    expect(res.json[0].result.tools[0].annotations.title).to.exist;
-    expect(res.json[0].result.tools[0].annotations.title).to.be.a('string');
-    expect(res.json[0].result.nextCursor).to.exist;
-    expect(res.json[0].result.nextCursor).to.be.a('string');
-    expect(res.json[0].result.nextCursor).to.equal('');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.tools).to.exist;
+    expect(res.json.result.tools.length).to.be.greaterThan(0);
+    expect(res.json.result.tools[0].name).to.exist;
+    expect(res.json.result.tools[0].description).to.exist;
+    expect(res.json.result.tools[0].inputSchema).to.exist;
+    expect(res.json.result.tools[0].annotations).to.exist;
+    expect(res.json.result.tools[0].annotations.title).to.exist;
+    expect(res.json.result.tools[0].annotations.title).to.be.a('string');
+    expect(res.json.result.nextCursor).to.exist;
+    expect(res.json.result.nextCursor).to.be.a('string');
+    expect(res.json.result.nextCursor).to.equal('');
 
-    const tools = res.json[0].result.tools;
+    const tools = res.json.result.tools;
     const tool = tools.find(tool => tool.name === 'my_function');
     expect(tool).to.exist;
     expect(tool.name).to.equal('my_function');
@@ -399,12 +390,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32602);
-    expect(res.json[0].error.message).to.contain('Invalid "name" parameter');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32602);
+    expect(res.json.error.message).to.contain('Invalid "name" parameter');
 
   });
 
@@ -420,12 +410,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32602);
-    expect(res.json[0].error.message).to.contain('Invalid "arguments" parameter');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32602);
+    expect(res.json.error.message).to.contain('Invalid "arguments" parameter');
 
   });
 
@@ -441,12 +430,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].error).to.exist;
-    expect(res.json[0].error.code).to.equal(-32601);
-    expect(res.json[0].error.message).to.contain('No such tool: "test-not-found"');
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.code).to.equal(-32601);
+    expect(res.json.error.message).to.contain('No such tool: "test-not-found"');
 
   });
 
@@ -462,15 +450,14 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.content).to.exist;
-    expect(res.json[0].result.content.length).to.equal(1);
-    expect(res.json[0].result.content[0].type).to.equal('text');
-    expect(res.json[0].result.content[0].text).to.equal('6');
-    expect(res.json[0].result.isError).to.equal(false);
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.content).to.exist;
+    expect(res.json.result.content.length).to.equal(1);
+    expect(res.json.result.content[0].type).to.equal('text');
+    expect(res.json.result.content[0].text).to.equal('6');
+    expect(res.json.result.isError).to.equal(false);
 
   });
 
@@ -604,14 +591,13 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.resources).to.exist;
-    expect(res.json[0].result.resources.length).to.be.greaterThan(0);
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.resources).to.exist;
+    expect(res.json.result.resources.length).to.be.greaterThan(0);
 
-    const resource = res.json[0].result.resources.find(resource => resource.uri === 'file://video.mp4');
+    const resource = res.json.result.resources.find(resource => resource.uri === 'file://video.mp4');
     expect(resource).to.exist;
     expect(resource.mimeType).to.equal('video/mp4');
     expect(resource.name).to.equal('video.mp4');
@@ -631,15 +617,14 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.contents).to.exist;
-    expect(res.json[0].result.contents.length).to.equal(1);
-    expect(res.json[0].result.contents[0].uri).to.equal('file://video.mp4');
-    expect(res.json[0].result.contents[0].mimeType).to.equal('video/mp4');
-    expect(res.json[0].result.contents[0].blob.length).to.be.greaterThan(0);
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.contents).to.exist;
+    expect(res.json.result.contents.length).to.equal(1);
+    expect(res.json.result.contents[0].uri).to.equal('file://video.mp4');
+    expect(res.json.result.contents[0].mimeType).to.equal('video/mp4');
+    expect(res.json.result.contents[0].blob.length).to.be.greaterThan(0);
 
   });
 
@@ -655,12 +640,11 @@ export default async function (setupResult) {
     expect(res.headers['content-type']).to.equal('application/json');
 
     expect(res.json).to.exist;
-    expect(res.json[0]).to.exist;
-    expect(res.json[0].jsonrpc).to.equal('2.0');
-    expect(res.json[0].id).to.equal(1);
-    expect(res.json[0].result).to.exist;
-    expect(res.json[0].result.resourceTemplates).to.exist;
-    expect(res.json[0].result.resourceTemplates.length).to.be.greaterThan(0);
+    expect(res.json.jsonrpc).to.equal('2.0');
+    expect(res.json.id).to.equal(1);
+    expect(res.json.result).to.exist;
+    expect(res.json.result.resourceTemplates).to.exist;
+    expect(res.json.result.resourceTemplates.length).to.be.greaterThan(0);
 
   });
 
