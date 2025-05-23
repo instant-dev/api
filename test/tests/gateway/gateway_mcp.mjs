@@ -45,6 +45,51 @@ export default async function (setupResult) {
     expect(res.json).to.exist;
 
   });
+
+  it('Should return 405 method not allowed for GET requests', async () => {
+
+    let res = await this.get('/server.mcp', {});
+
+    expect(res.statusCode).to.equal(405);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+
+  });
+
+  it('Should return 405 method not allowed for PUT requests', async () => {
+
+    let res = await this.get('/server.mcp', {});
+
+    expect(res.statusCode).to.equal(405);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+
+  });
+
+  it('Should return 405 method not allowed for DELETE requests', async () => {
+
+    let res = await this.get('/server.mcp', {});
+
+    expect(res.statusCode).to.equal(405);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+
+  });
   
   it('Should return a valid MCP endpoint, but return invalid JSONRPC request message', async () => {
 
