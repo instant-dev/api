@@ -172,6 +172,51 @@ export default async function (setupResult) {
 
   });
 
+  it('Should return 202 accepted for notifications from client', async () => {
+
+    let res = await this.request('POST', '/server.mcp', { method: 'notification/*' });
+
+    expect(res.statusCode).to.equal(202);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('text/plain');
+
+    expect(res.body.toString()).to.equal('');
+
+  });
+
+  it('Should return 202 accepted for response from client', async () => {
+
+    let res = await this.request('POST', '/server.mcp', { method: 'response', result: 'test' });
+
+    expect(res.statusCode).to.equal(202);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('text/plain');
+
+    expect(res.body.toString()).to.equal('');
+
+  });
+
+  it('Should return 202 accepted for response error from client', async () => {
+
+    let res = await this.request('POST', '/server.mcp', { method: 'response', error: 'test' });
+
+    expect(res.statusCode).to.equal(202);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('text/plain');
+
+    expect(res.body.toString()).to.equal('');
+
+  });
+
   it('Should return a ping response', async () => {
 
     let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'ping', params: {} });
