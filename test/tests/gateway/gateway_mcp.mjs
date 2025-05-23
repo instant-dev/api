@@ -229,6 +229,8 @@ export default async function (setupResult) {
     expect(res.json[0].result.capabilities).to.exist;
     expect(res.json[0].result.capabilities.tools).to.exist;
     expect(res.json[0].result.capabilities.tools).to.deep.equal({});
+    expect(res.json[0].result.capabilities.resources).to.exist;
+    expect(res.json[0].result.capabilities.resources).to.deep.equal({});
     expect(res.json[0].result.serverInfo).to.exist;
     expect(res.json[0].result.serverInfo.name).to.equal('MyMCPServer');
     expect(res.json[0].result.serverInfo.version).to.equal('1.0');
@@ -487,6 +489,57 @@ export default async function (setupResult) {
     expect(res.json[1].result.content[0].resource.mimeType).to.equal('application/octet-stream');
     expect(res.json[1].result.content[0].resource.blob).to.equal(Buffer.from('lol').toString('base64'));
     expect(res.json[1].result.isError).to.equal(false);
+
+  });
+
+  it('Should return a resources/list response', async () => {
+
+    let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'resources/list', params: {} });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json[0]).to.exist;
+    expect(res.json[0].jsonrpc).to.equal('2.0');
+    expect(res.json[0].id).to.equal(1);
+    expect(res.json[0].result).to.exist;
+    expect(res.json[0].result.resources).to.exist;
+    expect(res.json[0].result.resources.length).to.be.greaterThan(0);
+
+    const resource = res.json[0].result.resources.find(resource => resource.uri === 'file://video.mp4');
+    expect(resource).to.exist;
+    expect(resource.mimeType).to.equal('video/mp4');
+    expect(resource.name).to.equal('video.mp4');
+    expect(resource.description).to.equal('video.mp4');
+
+  });
+
+  it('Should return a resources/read response', async () => {
+
+    let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'resources/read', params: { uri: 'file://video.mp4' } });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json[0]).to.exist;
+    expect(res.json[0].jsonrpc).to.equal('2.0');
+    expect(res.json[0].id).to.equal(1);
+    expect(res.json[0].result).to.exist;
+    expect(res.json[0].result.contents).to.exist;
+    expect(res.json[0].result.contents.length).to.equal(1);
+    expect(res.json[0].result.contents[0].uri).to.equal('file://video.mp4');
+    expect(res.json[0].result.contents[0].mimeType).to.equal('video/mp4');
+    expect(res.json[0].result.contents[0].blob.length).to.be.greaterThan(0);
 
   });
 
