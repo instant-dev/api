@@ -543,6 +543,27 @@ export default async function (setupResult) {
 
   });
 
+  it('Should return a resources/templates/list response', async () => {
+
+    let res = await this.post('/server.mcp', { jsonrpc: '2.0', id: 1, method: 'resources/templates/list', params: {} });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers).to.haveOwnProperty('access-control-allow-origin');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-methods');
+    expect(res.headers).to.haveOwnProperty('access-control-allow-headers');
+    expect(res.headers).to.haveOwnProperty('access-control-expose-headers');
+    expect(res.headers['content-type']).to.equal('application/json');
+
+    expect(res.json).to.exist;
+    expect(res.json[0]).to.exist;
+    expect(res.json[0].jsonrpc).to.equal('2.0');
+    expect(res.json[0].id).to.equal(1);
+    expect(res.json[0].result).to.exist;
+    expect(res.json[0].result.resourceTemplates).to.exist;
+    expect(res.json[0].result.resourceTemplates.length).to.be.greaterThan(0);
+
+  });
+
   after(() => FaaSGateway.close());
 
 };
