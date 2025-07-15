@@ -3021,12 +3021,40 @@ export default async function (setupResult) {
 
   });
 
+  it('Should parse buffers within object from the test suite (Buffer object)', async () => {
+
+    let res = await this.post('/buffer_within_object_param/', {
+      objectParam: {
+        bufferVal: Buffer.from('abcde')
+      }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json).to.equal('ok');
+
+  });
+
   it('Should parse buffers within array params', async () => {
 
     let res = await this.post('/buffer_within_array_param/', {
       arrayParam: [{
         _base64: 'abcde'
       }]
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/json');
+    expect(res.json).to.exist;
+    expect(res.json).to.equal('ok');
+
+  });
+
+  it('Should parse buffers within array params from the test suite (Buffer object)', async () => {
+
+    let res = await this.post('/buffer_within_array_param/', {
+      arrayParam: [Buffer.from('abcde')]
     });
 
     expect(res.statusCode).to.equal(200);
