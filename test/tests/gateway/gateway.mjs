@@ -2226,6 +2226,36 @@ export default async function (setupResult) {
 
   });
 
+  it('Should successfully return a request with the optional values and fields: nested optional array', async () => {
+
+    let res = await this.post('/optional_nested_schema_params/', {obj: {name: 'steve', participants: {}}});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.exist;
+    expect(res.json).to.deep.equal({name: 'steve', participants: {}});
+
+  });
+
+  it('Should successfully return a request with the optional values and fields: nested optional array, one empty', async () => {
+
+    let res = await this.post('/optional_nested_schema_params/', {obj: {name: 'steve', participants: { add: [] }}});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.exist;
+    expect(res.json).to.deep.equal({name: 'steve', participants: { add: [] }});
+
+  });
+
+  it('Should successfully return a request with the optional values and fields: nested optional array, one with a value', async () => {
+
+    let res = await this.post('/optional_nested_schema_params/', {obj: {name: 'steve', participants: { add: ['cool'] }}});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.exist;
+    expect(res.json).to.deep.equal({name: 'steve', participants: { add: ['cool'] }});
+
+  });
+
   it('Should accept a request that matches first of two schemas', async () => {
 
     let res = await this.post('/object_alternate_schema/', {fileOrFolder: {name: 'test', size: 100}});
