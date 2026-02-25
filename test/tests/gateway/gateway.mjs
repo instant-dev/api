@@ -4278,6 +4278,55 @@ export default async function (setupResult) {
 
   });
 
+  it('Should error POST with invalid stream @charge details in execution with _stream set', async () => {
+
+    let res = await this.post('/stream/stream_charge_invalid/', {alpha: 'hello', _stream: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
+    expect(res.body).to.exist;
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['@error']).to.exist;
+    expect(events['@response']).to.exist;
+
+    let error = JSON.parse(events['@error'][0]);
+    expect(error.type).to.equal('StreamError');
+    expect(error.message).to.satisfy(msg => msg.startsWith(`Stream Parameter Error: "@charge".`));
+    expect(error.details).to.haveOwnProperty('@charge');
+    expect(error.details['@charge'].invalid).to.equal(true);
+    expect(error.details['@charge'].expected.type).to.equal('integer');
+    expect(error.details['@charge'].actual.value).to.equal('what');
+    expect(error.details['@charge'].actual.type).to.equal('string');
+
+    let response = JSON.parse(events['@response'][0]);
+    expect(response.headers['Content-Type']).to.equal('application/json');
+    expect(response.statusCode).to.equal(200);
+    expect(response.body).to.equal('true');
+
+  });
+
+  it('Should succeed POST with valid stream @charge details in execution with _stream set', async () => {
+
+    let res = await this.post('/stream/stream_charge_valid/', {alpha: 'hello', _stream: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
+    expect(res.body).to.exist;
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['@error']).to.not.exist;
+    expect(events['@response']).to.exist;
+
+    let response = JSON.parse(events['@response'][0]);
+    expect(response.headers['Content-Type']).to.equal('application/json');
+    expect(response.statusCode).to.equal(200);
+    expect(response.body).to.equal('true');
+
+  });
+
   it('Should quietly fail if invalid stream name in execution without _stream set', async () => {
 
     let res = await this.post('/stream/invalid_stream_name/', {alpha: 'hello'});
