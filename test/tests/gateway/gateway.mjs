@@ -4139,7 +4139,6 @@ export default async function (setupResult) {
 
     expect(events['hello'][0]).to.exist;
     let hello_0 = JSON.parse(events['hello'][0]);
-    console.log(hello_0);
     expect(hello_0.date).to.be.a('string');
 
     expect(events['hello'][1]).to.exist;
@@ -4278,9 +4277,33 @@ export default async function (setupResult) {
 
   });
 
-  it('Should error POST with invalid stream @charge details in execution with _stream set', async () => {
+  it('Should error POST with invalid stream @charge details (not set) in execution with _stream set', async () => {
 
     let res = await this.post('/stream/stream_charge_invalid/', {alpha: 'hello', _stream: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
+    expect(res.body).to.exist;
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['@error']).to.exist;
+    expect(events['@response']).to.exist;
+
+    let error = JSON.parse(events['@error'][0]);
+    expect(error.type).to.equal('StreamError');
+    expect(error.message).to.satisfy(msg => msg.startsWith(`The @charge stream is not enabled for this function. You must set a preauthorized charge amount using the @charge directive.`));
+
+    let response = JSON.parse(events['@response'][0]);
+    expect(response.headers['Content-Type']).to.equal('application/json');
+    expect(response.statusCode).to.equal(200);
+    expect(response.body).to.equal('true');
+
+  });
+
+  it('Should error POST with invalid stream @charge details (type) in execution with _stream set', async () => {
+
+    let res = await this.post('/stream/stream_charge_invalid_type/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
     expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
@@ -4307,9 +4330,9 @@ export default async function (setupResult) {
 
   });
 
-  it('Should error POST with invalid stream @charge details (out of range) in execution with _stream set', async () => {
+  it('Should error POST with invalid stream @charge details (out of range, min) in execution with _stream set', async () => {
 
-    let res = await this.post('/stream/stream_charge_invalid_range/', {alpha: 'hello', _stream: true});
+    let res = await this.post('/stream/stream_charge_invalid_range_min/', {alpha: 'hello', _stream: true});
 
     expect(res.statusCode).to.equal(200);
     expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
@@ -4326,6 +4349,33 @@ export default async function (setupResult) {
     expect(error.details).to.haveOwnProperty('@charge');
     expect(error.details['@charge'].invalid).to.equal(true);
     expect(error.details['@charge'].message).to.contain('must be greater than or equal to 0');
+
+    let response = JSON.parse(events['@response'][0]);
+    expect(response.headers['Content-Type']).to.equal('application/json');
+    expect(response.statusCode).to.equal(200);
+    expect(response.body).to.equal('true');
+
+  });
+
+  it('Should error POST with invalid stream @charge details (out of range, max) in execution with _stream set', async () => {
+
+    let res = await this.post('/stream/stream_charge_invalid_range_max/', {alpha: 'hello', _stream: true});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type'].split(';')[0]).to.equal('text/event-stream');
+    expect(res.body).to.exist;
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['@error']).to.exist;
+    expect(events['@response']).to.exist;
+
+    let error = JSON.parse(events['@error'][0]);
+    expect(error.type).to.equal('StreamError');
+    expect(error.message).to.satisfy(msg => msg.startsWith(`Stream Parameter Error: "@charge".`));
+    expect(error.details).to.haveOwnProperty('@charge');
+    expect(error.details['@charge'].invalid).to.equal(true);
+    expect(error.details['@charge'].message).to.contain('must be less than or equal to 1');
 
     let response = JSON.parse(events['@response'][0]);
     expect(response.headers['Content-Type']).to.equal('application/json');
