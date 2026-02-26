@@ -6,7 +6,7 @@
 */
 module.exports = async (alpha, context) => {
 
-  context.stream('@charge', 100);
+  context.charge(100);
 
   return true;
 
