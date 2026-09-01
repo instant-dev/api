@@ -1509,6 +1509,22 @@ export default async function (setupResult) {
     expect(res.json.error).to.exist;
     expect(res.json.error).to.be.an('object');
     expect(res.json.error.type).to.equal('TimeoutError');
+    expect(Object.keys(FaaSGateway._timeouts).length).to.equal(0);
+
+  });
+
+  it('Should clear the execution timeout when a request completes before the timeout', async () => {
+
+    let cachedTimeout = FaaSGateway.defaultTimeout;
+    FaaSGateway.defaultTimeout = 120000;
+
+    try {
+      let res = await this.post('/my_function/', {});
+      expect(res.statusCode).to.equal(200);
+      expect(Object.keys(FaaSGateway._timeouts).length).to.equal(0);
+    } finally {
+      FaaSGateway.defaultTimeout = cachedTimeout;
+    }
 
   });
 
