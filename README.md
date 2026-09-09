@@ -1105,6 +1105,43 @@ export async function GET () {
 }
 ```
 
+You can also specify a `contentDisposition` to set the `Content-Disposition` http header.
+This is useful for giving the file a name, or forcing the browser to download it instead
+of displaying it:
+
+```javascript
+import fs from 'fs';
+
+/**
+ * Return an image from the filesystem to be downloaded as "photo.png"
+ */
+export async function GET () {
+  const buffer = fs.readFileSync('./path/to/image.png');
+  buffer.contentType = 'image/png';
+  buffer.contentDisposition = 'attachment; filename="photo.png"';
+  return buffer;
+}
+```
+
+For the common case of naming a download, `filename` is a shorthand that does both:
+it infers the `Content-Type` from the file extension and sets
+`Content-Disposition: attachment; filename="..."` (with proper encoding for
+non-ASCII names). Explicitly set `contentType` or `contentDisposition` values
+take precedence.
+
+```javascript
+import fs from 'fs';
+
+/**
+ * Return an image from the filesystem to be downloaded as "photo.png"
+ */
+export async function GET () {
+  const buffer = fs.readFileSync('./path/to/image.png');
+  buffer.filename = 'photo.png';
+  return buffer;
+}
+```
+
 #### Streaming responses
 
 Instant API has first-class support for streaming using the `text/event-stream`

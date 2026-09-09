@@ -3032,6 +3032,99 @@ export default async function (setupResult) {
 
   });
 
+  it('Should return a buffer properly with a .contentDisposition set', async () => {
+
+    let res = await this.post('/buffer_return_content_disposition/', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('image/png');
+    expect(res.headers['content-disposition']).to.equal('attachment; filename="lol.png"');
+    expect(res.headers['access-control-expose-headers'].split(', ')).to.include('content-disposition');
+    expect(res.body).to.be.instanceof(Buffer);
+    expect(res.body.toString()).to.equal('lol');
+
+  });
+
+  it('Should return a buffer properly with a .contentDisposition set (streaming)', async () => {
+
+    let res = await this.post('/buffer_return_content_disposition/?_stream', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('text/event-stream; charset=utf-8');
+
+    let events = res.events;
+    expect(events).to.exist;
+    expect(events['@response']).to.exist;
+
+    const response = JSON.parse(events['@response']);
+    expect(response.statusCode).to.equal(200);
+    expect(response.headers['Content-Type']).to.equal('image/png');
+    expect(response.headers['Content-Disposition']).to.equal('attachment; filename="lol.png"');
+    expect(response.body).to.exist;
+
+    const body = JSON.parse(response.body);
+    expect(body._base64).to.exist;
+    expect(Buffer.from(body._base64, 'base64').toString()).to.equal('lol');
+
+  });
+
+  it('Should return a buffer with a .filename set, inferring Content-Type and Content-Disposition', async () => {
+
+    let res = await this.post('/buffer_return_filename/', {filename: 'lol.png'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('image/png');
+    expect(res.headers['content-disposition']).to.equal('attachment; filename="lol.png"');
+    expect(res.headers['access-control-expose-headers'].split(', ')).to.include('content-disposition');
+    expect(res.body.toString()).to.equal('lol');
+
+  });
+
+  it('Should return a buffer with a .filename set with an unknown extension, defaulting Content-Type', async () => {
+
+    let res = await this.post('/buffer_return_filename/', {filename: 'lol.unknownext'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/octet-stream');
+    expect(res.headers['content-disposition']).to.equal('attachment; filename="lol.unknownext"');
+
+  });
+
+  it('Should return a buffer with a non-ASCII .filename using RFC 5987 encoding', async () => {
+
+    let res = await this.post('/buffer_return_filename/', {filename: 'résumé "final".pdf'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('application/pdf');
+    expect(res.headers['content-disposition']).to.equal(
+      `attachment; filename="r_sum_ \\"final\\".pdf"; filename*=UTF-8''r%C3%A9sum%C3%A9%20%22final%22.pdf`
+    );
+
+  });
+
+  it('Should strip directory components from a .filename', async () => {
+
+    let res = await this.post('/buffer_return_filename/', {filename: '../../etc/passwd.txt'});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-disposition']).to.equal('attachment; filename="passwd.txt"');
+
+  });
+
+  it('Should prefer explicit .contentType and .contentDisposition over .filename', async () => {
+
+    let res = await this.post('/buffer_return_filename/', {
+      filename: 'lol.png',
+      contentType: 'text/html',
+      contentDisposition: 'inline; filename="other.html"'
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.headers['content-type']).to.equal('text/html');
+    expect(res.headers['content-disposition']).to.equal('inline; filename="other.html"');
+
+  });
+
   it('Should return a nested buffer properly', async () => {
 
     let res = await this.post('/buffer_nested_return/', {});
