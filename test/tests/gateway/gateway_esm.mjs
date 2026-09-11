@@ -703,6 +703,25 @@ export default async function (setupResult) {
 
   });
 
+  it('Should reject an integer with invalid entry in range restriction {0,} (zero bound must be preserved)', async () => {
+
+    let res = await this.post('/esm/zero_range/', {myval: -1});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details['myval'].message).to.contain('greater than or equal to 0')
+
+  });
+
+  it('Should accept an integer with valid entry in range restriction {0,}', async () => {
+
+    let res = await this.post('/esm/zero_range/', {myval: 0});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({myval: 0})
+
+  });
+
   it('Should accept an integer with valid entry in range restriction {,1}', async () => {
     
     let res = await this.post('/esm/right_range/', {myval: 1});

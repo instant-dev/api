@@ -2826,6 +2826,8 @@ export default async function (setupResult) {
     let res = await this.post('/keyql_limit_range/', {limit: {count: 1, offset: 0}});
 
     expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('count must be greater than or equal to 2');
 
   });
 
@@ -2834,6 +2836,30 @@ export default async function (setupResult) {
     let res = await this.post('/keyql_limit_range/', {limit: {count: 30, offset: 0}});
 
     expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('count must be less than or equal to 20');
+
+  });
+
+  it('Should reject keyql limit count below one-sided range {2,}', async () => {
+
+    let res = await this.post('/keyql_limit_range_open/', {limit: {count: 1, offset: 0}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('count must be greater than or equal to 2');
+
+  });
+
+  it('Should accept keyql limit count within one-sided range {2,} (no upper bound)', async () => {
+
+    let res = await this.post('/keyql_limit_range_open/', {limit: {count: 2, offset: 0}});
+
+    expect(res.statusCode).to.equal(200);
+
+    res = await this.post('/keyql_limit_range_open/', {limit: {count: 5000, offset: 0}});
+
+    expect(res.statusCode).to.equal(200);
 
   });
 
@@ -2892,6 +2918,156 @@ export default async function (setupResult) {
     let res = await this.post('/range_number/', {ranged: 200});
 
     expect(res.statusCode).to.equal(400);
+
+  });
+
+  it('Should accept nested integer at range boundaries', async () => {
+
+    let res = await this.post('/range_nested_integer/', {limit: {count: 1, offset: 0}});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({count: 1, offset: 0});
+
+    res = await this.post('/range_nested_integer/', {limit: {count: 100, offset: 5}});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({count: 100, offset: 5});
+
+  });
+
+  it('Should accept nested integer range using default value', async () => {
+
+    let res = await this.post('/range_nested_integer/', {});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({count: 100, offset: 0});
+
+  });
+
+  it('Should reject nested integer outside range, upperbound', async () => {
+
+    let res = await this.post('/range_nested_integer/', {limit: {count: 101, offset: 0}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('limit.count must be less than or equal to 100');
+
+  });
+
+  it('Should reject nested integer outside range, lowerbound', async () => {
+
+    let res = await this.post('/range_nested_integer/', {limit: {count: 0, offset: 0}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('limit.count must be greater than or equal to 1');
+
+  });
+
+  it('Should reject nested integer outside open-ended range {0,}', async () => {
+
+    let res = await this.post('/range_nested_integer/', {limit: {count: 10, offset: -1}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('limit.offset must be greater than or equal to 0');
+
+  });
+
+  it('Should reject nested integer outside range via GET query string', async () => {
+
+    let res = await this.get('/range_nested_integer/', 'limit.count=101&limit.offset=0');
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.limit.message).to.equal('limit.count must be less than or equal to 100');
+
+  });
+
+  it('Should accept nested string at size boundaries', async () => {
+
+    let res = await this.post('/size_nested_string/', {user: {username: 'a'.repeat(32), nickname: 'ab'}});
+
+    expect(res.statusCode).to.equal(200);
+
+    res = await this.post('/size_nested_string/', {user: {username: '', nickname: 'abc'}});
+
+    expect(res.statusCode).to.equal(200);
+
+  });
+
+  it('Should reject nested string exceeding max size', async () => {
+
+    let res = await this.post('/size_nested_string/', {user: {username: 'a'.repeat(33), nickname: 'ab'}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.user.message).to.equal('user.username must have length less than or equal to 32');
+
+  });
+
+  it('Should reject nested string below min size', async () => {
+
+    let res = await this.post('/size_nested_string/', {user: {username: 'abc', nickname: 'a'}});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.user.message).to.equal('user.nickname must have length greater than or equal to 2');
+
+  });
+
+  it('Should accept array of objects with ranged member at boundaries', async () => {
+
+    let res = await this.post('/range_nested_array/', {users: [{name: 'a', age: 0}, {name: 'b', age: 150}]});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal([{name: 'a', age: 0}, {name: 'b', age: 150}]);
+
+  });
+
+  it('Should reject array of objects with ranged member out of range', async () => {
+
+    let res = await this.post('/range_nested_array/', {users: [{name: 'a', age: 20}, {name: 'b', age: 151}]});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.users.message).to.equal('users[1].age must be less than or equal to 150');
+
+    res = await this.post('/range_nested_array/', {users: [{name: 'a', age: -1}]});
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.users.message).to.equal('users[0].age must be greater than or equal to 0');
+
+  });
+
+  it('Should accept returns schema with ranged nested field at boundaries', async () => {
+
+    let res = await this.post('/range_nested_returns/', {count: 1});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({limit: {count: 1}});
+
+    res = await this.post('/range_nested_returns/', {count: 100});
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.json).to.deep.equal({limit: {count: 100}});
+
+  });
+
+  it('Should fail return validation for returns schema with ranged nested field out of range', async () => {
+
+    let res = await this.post('/range_nested_returns/', {count: 101});
+
+    expect(res.statusCode).to.equal(502);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.returns.message).to.equal('$.limit.count must be less than or equal to 100');
+
+    res = await this.post('/range_nested_returns/', {count: 0});
+
+    expect(res.statusCode).to.equal(502);
+    expect(res.json.error).to.exist;
+    expect(res.json.error.details.returns.message).to.equal('$.limit.count must be greater than or equal to 1');
 
   });
 
