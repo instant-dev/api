@@ -112,6 +112,13 @@ export default async function (setupResult) {
 
   });
 
+  it('Should read function activity', () => {
+
+    expect(definitions['test'].activity).to.equal('Searching for **$a**...');
+    expect(definitions['returns'].activity).to.equal(null);
+
+  });
+
   it('Should have correct context', () => {
 
     expect(definitions[''].context).to.equal(null);
