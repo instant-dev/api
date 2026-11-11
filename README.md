@@ -163,6 +163,7 @@ data: {"statusCode":200,"headers":{"X-Execution-Uuid":"2e7c7860-4a66-4824-98fa-a
 1. [Getting Started](#getting-started)
    1. [Quickstart](#quickstart)
    1. [Custom installation](#custom-installation)
+   1. [Hot reloading in development](#hot-reloading-in-development)
 1. [Endpoints and Type Safety](#endpoints-and-type-safety)
    1. [Creating Endpoints](#creating-endpoints)
    1. [Responding to HTTP methods](#responding-to-http-methods)
@@ -332,6 +333,26 @@ To start your server, simply run:
 ```javascript
 npm start
 ```
+
+### Hot reloading in development
+
+In development (`NODE_ENV` unset or `development`), the Daemon watches your
+project and restarts its workers whenever a file changes. `node_modules`,
+dotfiles and `dump.rdb` are never watched. Set `DISABLE_HOT_RELOAD=1` to turn
+it off.
+
+To leave other paths unwatched, such as tests or generated output, list them
+in a `.daemonignore` file in your project root, one per line, relative to the
+root. A directory covers everything under it, and lines starting with `#` are
+comments:
+
+```
+# Saving tests or task output never restarts the server
+test/
+task_output/
+```
+
+The file is read each time the Daemon starts watching.
 
 ## Endpoints and Type Safety
 
